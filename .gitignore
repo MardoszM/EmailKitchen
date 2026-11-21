@@ -1,0 +1,29 @@
+# .NET build output
+**/bin/
+**/obj/
+artifacts/
+TestResults/
+coverage/
+
+# Packages created by local NuGet packing
+*.nupkg
+*.snupkg
+
+# Rider / IntelliJ
+.idea/
+*.sln.iml
+
+# Visual Studio user-specific files
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# macOS
+.DS_Store
+
+# Temporary files
+*.tmp
+*.swp
+*~
