@@ -1,0 +1,68 @@
+<Project>
+  <PropertyGroup>
+    <EmailStudioTemplatesPath Condition="'$(EmailStudioTemplatesPath)' == ''">./EmailStudio/Templates</EmailStudioTemplatesPath>
+    <_EmailStudioTemplatesDirectory>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/$(EmailStudioTemplatesPath)'))</_EmailStudioTemplatesDirectory>
+    <_EmailStudioTemplatesRelativePath>$([System.IO.Path]::GetRelativePath('$(MSBuildProjectDirectory)', '$(_EmailStudioTemplatesDirectory)'))</_EmailStudioTemplatesRelativePath>
+    <_EmailStudioTemplatesSourceDirectory Condition="Exists('$(MSBuildThisFileDirectory)../Studio/DefaultTemplates/TestEmail.cshtml')">$(MSBuildThisFileDirectory)../Studio/DefaultTemplates</_EmailStudioTemplatesSourceDirectory>
+    <_EmailStudioTemplatesSourceDirectory Condition="'$(_EmailStudioTemplatesSourceDirectory)' == ''">$(MSBuildThisFileDirectory)EmailStudioTemplates</_EmailStudioTemplatesSourceDirectory>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(UsingMicrosoftNETSdkWeb)' == 'true' and '$(_EmailStudioTemplatesRelativePath)' != '.'">
+    <Content Include="$(_EmailStudioTemplatesRelativePath)/**/*.cshtml"
+             Exclude="@(Content);$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder)" />
+    <Compile Include="$(_EmailStudioTemplatesRelativePath)/**/*.cs"
+             Exclude="@(Compile);$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder)" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UsingMicrosoftNETSdkWeb)' == 'true' and '$(_EmailStudioTemplatesRelativePath)' == '.'">
+    <Content Include="**/*.cshtml" Exclude="@(Content);$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder)" />
+    <Compile Include="**/*.cs" Exclude="@(Compile);$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Analyzer Include="$(MSBuildThisFileDirectory)../../EmailStudio.Analyzers/bin/$(Configuration)/netstandard2.0/EmailStudio.Analyzers.dll"
+              Condition="Exists('$(MSBuildThisFileDirectory)../../EmailStudio.Analyzers/bin/$(Configuration)/netstandard2.0/EmailStudio.Analyzers.dll')" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(DesignTimeBuild)' == 'true'">
+    <Analyzer Include="$(MSBuildThisFileDirectory)../../EmailStudio.Analyzers.CodeFixes/bin/$(Configuration)/netstandard2.0/EmailStudio.Analyzers.CodeFixes.dll"
+              Condition="Exists('$(MSBuildThisFileDirectory)../../EmailStudio.Analyzers.CodeFixes/bin/$(Configuration)/netstandard2.0/EmailStudio.Analyzers.CodeFixes.dll')" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(UsingMicrosoftNETSdkWeb)' == 'true'">
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>EmailStudioTemplatesPath</_Parameter1>
+      <_Parameter2>$(EmailStudioTemplatesPath)</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <Target Name="ValidateEmailStudioTemplatesPath">
+    <Error Condition="$([System.IO.Path]::IsPathRooted('$(EmailStudioTemplatesPath)'))"
+           Text="EmailStudioTemplatesPath must be relative to the project directory." />
+    <Error Condition="$([System.Text.RegularExpressions.Regex]::IsMatch('$(EmailStudioTemplatesPath)', '(^|[/\\])\.\.([/\\]|$)'))"
+           Text="EmailStudioTemplatesPath must stay inside the project directory." />
+  </Target>
+
+  <Target Name="ScaffoldEmailStudioTemplates"
+          BeforeTargets="ResolveRazorGenerateInputs"
+          DependsOnTargets="ValidateEmailStudioTemplatesPath"
+          Condition="'$(UsingMicrosoftNETSdkWeb)' == 'true' and '$(IsCrossTargetingBuild)' != 'true'">
+    <ItemGroup>
+      <_EmailStudioExistingTemplate Include="$(_EmailStudioTemplatesDirectory)/**/*.cshtml" />
+      <_EmailStudioDefaultTemplate Include="$(_EmailStudioTemplatesSourceDirectory)/**/*"
+                                   Condition="'@(_EmailStudioExistingTemplate)' == ''" />
+    </ItemGroup>
+
+    <MakeDir Directories="$(_EmailStudioTemplatesDirectory)" />
+    <MakeDir Directories="@(_EmailStudioDefaultTemplate->'$(_EmailStudioTemplatesDirectory)/%(RecursiveDir)')" />
+    <Copy SourceFiles="@(_EmailStudioDefaultTemplate)"
+          DestinationFiles="@(_EmailStudioDefaultTemplate->'$(_EmailStudioTemplatesDirectory)/%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
+
+    <ItemGroup>
+      <Content Include="$(_EmailStudioTemplatesRelativePath)/**/*.cshtml"
+               Exclude="@(Content);$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder)" />
+      <Compile Include="$(_EmailStudioTemplatesRelativePath)/**/*.cs"
+               Exclude="@(Compile);$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder)" />
+    </ItemGroup>
+  </Target>
+</Project>

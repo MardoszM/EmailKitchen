@@ -1,0 +1,5 @@
+<Project>
+  <ItemGroup Condition="'$(DesignTimeBuild)' == 'true'">
+    <Analyzer Include="$(MSBuildThisFileDirectory)EmailStudio.CodeFixes/EmailStudio.Analyzers.CodeFixes.dll" />
+  </ItemGroup>
+</Project>

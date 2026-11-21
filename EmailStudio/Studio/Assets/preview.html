@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <title>Email Preview · Email Studio</title>
+    <link rel="icon" href="__EMAIL_STUDIO_LOGO_URL__">
+    <link rel="stylesheet" href="__EMAIL_STUDIO_ROOT__/assets/studio.css">
+    <script type="module" src="__EMAIL_STUDIO_ROOT__/assets/studio.js"></script>
+</head>
+<body class="standalone" data-page="preview">
+    <header class="topbar">
+        <div class="preview-brand">
+            <a id="back-to-studio" class="button button-secondary back-button" href="__EMAIL_STUDIO_ROOT__" aria-label="Back to Email Studio">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
+                <span>Back<span class="back-destination"> to Email Studio</span></span>
+            </a>
+            <h1 id="preview-name">Email Preview</h1>
+        </div>
+        <div id="watch-warning" class="watch-warning" role="status" aria-label="Live preview will not update automatically because the app was not started with dotnet watch. Restart the app with dotnet watch to pick up template changes."
+             title="Live preview will not update automatically because the app was not started with dotnet watch. Restart the app with dotnet watch to pick up template changes." hidden>
+            <svg class="watch-warning-indicator" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path fill="currentColor" d="M12 2.8 1.35 21.2h21.3L12 2.8Z"/>
+                <path d="M12 8.4v6.1" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="2"/>
+                <circle cx="12" cy="17.4" r="1.15" fill="#fff"/>
+            </svg>
+            <span class="watch-warning-wide">Live preview won’t auto-update. Run <code>dotnet watch</code>.</span>
+            <span class="watch-warning-compact"><code>dotnet watch</code></span>
+        </div>
+        <div id="preview-state" class="preview-state" data-state="busy" role="status">
+            <span class="status-dot" aria-hidden="true"></span><span id="preview-status">Rendering…</span>
+        </div>
+        <div class="header-controls">
+            <label class="theme-control">
+                <span>Theme</span>
+                <select id="theme" aria-label="Theme">
+                    <option value="system">System</option>
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                </select>
+            </label>
+            <div class="view-controls" role="group" aria-label="Preview device size">
+                <button class="view-button" type="button" data-width="desktop" aria-pressed="true">Large</button>
+                <button class="view-button" type="button" data-width="mobile" aria-pressed="false">Mobile</button>
+            </div>
+        </div>
+    </header>
+    <main class="standalone-preview">
+        <div class="standalone-preview-surface">
+            <iframe id="preview" title="Rendered email" sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
+            <div id="preview-resize-handle" class="preview-resize-handle" role="slider"
+                 aria-label="Mobile preview width" aria-orientation="horizontal" aria-valuemin="320"
+                 aria-valuemax="760" aria-valuenow="390" aria-valuetext="390 pixels" tabindex="0" hidden>
+                <span aria-hidden="true"></span>
+            </div>
+        </div>
+        <p id="action-status" class="standalone-error" role="alert" hidden></p>
+    </main>
+</body>
+</html>
