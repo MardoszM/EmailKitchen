@@ -1,4 +1,6 @@
 <Project>
+  <Import Project="$(MSBuildThisFileDirectory)../build/EmailStudio.targets" />
+
   <ItemGroup Condition="'$(DesignTimeBuild)' == 'true'">
     <Analyzer Include="$(MSBuildThisFileDirectory)EmailStudio.CodeFixes/EmailStudio.Analyzers.CodeFixes.dll" />
   </ItemGroup>

@@ -43,7 +43,7 @@
     <ItemGroup>
         <None Include="../README.md" Pack="true" PackagePath="README.md" />
         <None Update="build/EmailStudio.targets" Pack="true" PackagePath="build/EmailStudio.targets" />
-        <None Update="build/EmailStudio.CodeFixes.targets" Pack="true" PackagePath="buildTransitive/EmailStudio.targets" />
+        <None Update="buildTransitive/EmailStudio.targets" Pack="true" PackagePath="buildTransitive/EmailStudio.targets" />
     </ItemGroup>
 
     <PropertyGroup>
