@@ -29,10 +29,13 @@ If `EmailStudioTemplatesPath` is omitted, EmailStudio uses `./EmailStudio/Templa
 ```csharp
 using EmailStudio.Studio;
 
-app.MapEmailStudio(enabled: app.Environment.IsDevelopment());
+if (app.Environment.IsDevelopment())
+{
+    app.MapEmailStudio();
+}
 ```
 
-The `enabled` flag controls whether the studio endpoints are mapped. The studio is available at `/email-studio` when enabled.
+The studio is available at `/email-studio` when its endpoints are mapped.
 
 ## Default model for a template
 

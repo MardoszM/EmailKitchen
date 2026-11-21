@@ -11,7 +11,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc.Razor;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Antiforgery;
-using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace EmailStudio.Studio;
@@ -19,7 +18,7 @@ namespace EmailStudio.Studio;
 public static class EmailStudioEndpoints
 {
     private const string Route = "/email-studio";
-    private static readonly FileExtensionContentTypeProvider ContentTypes = new();
+    private const string DefaultTemplatesPath = "./EmailStudio/Templates";
 
     private static readonly (string Resource, string RelativePath)[] DefaultTemplates =
     [
@@ -36,24 +35,20 @@ public static class EmailStudioEndpoints
         Converters = { new JsonStringEnumConverter() }
     };
 
-    public static void MapEmailStudio(this WebApplication app, bool enabled = true, string? logoPath = null)
+    public static void MapEmailStudio(this WebApplication app)
     {
-        if (!enabled)
-            return;
-
         var templatesPath = GetConfiguredTemplatesPath();
-        var useProjectRoot = string.IsNullOrWhiteSpace(templatesPath) || templatesPath == ".";
+        var useProjectRoot = templatesPath == ".";
         var (templatesDirectory, relativeTemplatesPath) = ResolveTemplatesPath(app.Environment.ContentRootPath,
             useProjectRoot ? "." : templatesPath!);
         CreateDefaultTemplatesIfMissing(templatesDirectory);
-        var customLogoPath = ResolveLogoPath(app.Environment.ContentRootPath, logoPath);
 
         var studio = app.MapGroup(Route);
         studio.MapGet("", (HttpContext context, IAntiforgery antiforgery) =>
         {
             using var reader = new StreamReader(OpenAsset("studio.html"));
             var token = HtmlEncoder.Default.Encode(antiforgery.GetAndStoreTokens(context).RequestToken!);
-            var html = ReplaceStudioRoot(reader.ReadToEnd(), GetStudioRoot(context), customLogoPath);
+            var html = ReplaceStudioRoot(reader.ReadToEnd(), GetStudioRoot(context));
             return Results.Content(html.Replace("__ANTIFORGERY_TOKEN__", token),
                 "text/html; charset=utf-8");
         });
@@ -61,7 +56,7 @@ public static class EmailStudioEndpoints
         {
             "studio.css" => ServeAsset(asset, "text/css; charset=utf-8"),
             "studio.js" => ServeAsset(asset, "text/javascript; charset=utf-8", GetStudioRoot(context)),
-            "email-studio-logo.png" => ServeLogo(context, customLogoPath),
+            "email-studio-logo.png" => ServeLogo(context),
             _ => Results.NotFound()
         });
         studio.MapGet("/templates", (IServiceProviderIsService services) =>
@@ -83,47 +78,42 @@ public static class EmailStudioEndpoints
         });
         studio.MapPost("/render", (StudioRenderRequest request, HttpContext context, IRazorViewEngine engine,
                 IRazorViewRendererService renderer, CancellationToken ct) =>
-            RenderAsync(request, templatesDirectory, relativeTemplatesPath, GetStudioRoot(context), customLogoPath,
-                engine, renderer, ct));
+            RenderAsync(request, templatesDirectory, relativeTemplatesPath, GetStudioRoot(context), engine, renderer, ct));
         studio.MapPost("/send", (StudioSendRequest request, HttpContext context,
                 IAntiforgery antiforgery, IRazorViewEngine engine, IRazorViewRendererService renderer,
                 ILoggerFactory loggerFactory, CancellationToken ct) =>
-            SendAsync(request, templatesDirectory, relativeTemplatesPath, customLogoPath, context, antiforgery,
-                engine, renderer, loggerFactory, ct));
+            SendAsync(request, templatesDirectory, relativeTemplatesPath, context, antiforgery, engine, renderer,
+                loggerFactory, ct));
         studio.MapGet("/preview/{**template}", (string template, HttpContext context) =>
             GetTemplatePath(templatesDirectory, relativeTemplatesPath, template) is null
                 ? Results.NotFound()
-                : ServeAsset("preview.html", "text/html; charset=utf-8", GetStudioRoot(context), customLogoPath));
+                : ServeAsset("preview.html", "text/html; charset=utf-8", GetStudioRoot(context)));
     }
 
     private static IResult ServeAsset(string name, string contentType) => Results.File(OpenAsset(name), contentType);
 
-    private static IResult ServeAsset(string name, string contentType, string studioRoot,
-        string? customLogoPath = null)
+    private static IResult ServeAsset(string name, string contentType, string studioRoot)
     {
         using var reader = new StreamReader(OpenAsset(name));
-        return Results.Content(ReplaceStudioRoot(reader.ReadToEnd(), studioRoot, customLogoPath), contentType);
+        return Results.Content(ReplaceStudioRoot(reader.ReadToEnd(), studioRoot), contentType);
     }
 
-    private static IResult ServeLogo(HttpContext context, string? customLogoPath)
+    private static IResult ServeLogo(HttpContext context)
     {
         context.Response.Headers.CacheControl = "no-store";
-
-        if (customLogoPath is not null && ContentTypes.TryGetContentType(customLogoPath, out var contentType))
-            return Results.File(customLogoPath, contentType);
 
         return Results.File(EmailLogo.Open(), "image/png");
     }
 
     private static string GetStudioRoot(HttpContext context) => $"{context.Request.PathBase}{Route}";
 
-    private static string ReplaceStudioRoot(string content, string studioRoot, string? customLogoPath = null) =>
+    private static string ReplaceStudioRoot(string content, string studioRoot) =>
         content.Replace("__EMAIL_STUDIO_ROOT__", studioRoot, StringComparison.Ordinal)
-            .Replace("__EMAIL_STUDIO_LOGO_URL__", GetLogoUrl(studioRoot, customLogoPath), StringComparison.Ordinal);
+            .Replace("__EMAIL_STUDIO_LOGO_URL__", GetLogoUrl(studioRoot), StringComparison.Ordinal);
 
-    private static string GetLogoUrl(string studioRoot, string? customLogoPath)
+    private static string GetLogoUrl(string studioRoot)
     {
-        using var logo = customLogoPath is null ? EmailLogo.Open() : File.OpenRead(customLogoPath);
+        using var logo = EmailLogo.Open();
         var version = Convert.ToHexStringLower(SHA256.HashData(logo));
         return $"{studioRoot}/assets/email-studio-logo.png?v={version}";
     }
@@ -131,9 +121,12 @@ public static class EmailStudioEndpoints
     private static Stream OpenAsset(string name) =>
         typeof(EmailStudioEndpoints).Assembly.GetManifestResourceStream($"EmailStudio.{name}")!;
 
-    private static string? GetConfiguredTemplatesPath() =>
-        Assembly.GetEntryAssembly()?.GetCustomAttributes<AssemblyMetadataAttribute>()
+    private static string GetConfiguredTemplatesPath()
+    {
+        var configuredPath = Assembly.GetEntryAssembly()?.GetCustomAttributes<AssemblyMetadataAttribute>()
             .FirstOrDefault(attribute => attribute.Key == "EmailStudioTemplatesPath")?.Value;
+        return string.IsNullOrWhiteSpace(configuredPath) ? DefaultTemplatesPath : configuredPath;
+    }
 
     private static (string Directory, string RelativePath) ResolveTemplatesPath(string contentRoot,
         string templatesPath)
@@ -153,24 +146,6 @@ public static class EmailStudioEndpoints
                 nameof(templatesPath));
 
         return (directory, relativePath == "." ? "" : relativePath.Replace(Path.DirectorySeparatorChar, '/'));
-    }
-
-    private static string? ResolveLogoPath(string contentRoot, string? logoPath)
-    {
-        if (string.IsNullOrWhiteSpace(logoPath))
-            return null;
-
-        var path = Path.GetFullPath(Path.IsPathRooted(logoPath)
-            ? logoPath
-            : Path.Combine(contentRoot, logoPath));
-        if (!File.Exists(path))
-            throw new FileNotFoundException("The configured Email Studio logo file was not found.", path);
-        if (!ContentTypes.TryGetContentType(path, out var contentType) ||
-            !contentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
-            throw new ArgumentException("The configured Email Studio logo must be a supported image file.",
-                nameof(logoPath));
-
-        return path;
     }
 
     private static void CreateDefaultTemplatesIfMissing(string templatesDirectory)
@@ -287,7 +262,7 @@ public static class EmailStudioEndpoints
     }
 
     private static async Task<IResult> RenderAsync(StudioRenderRequest request, string templatesDirectory,
-        string relativeTemplatesPath, string studioRoot, string? customLogoPath, IRazorViewEngine engine,
+        string relativeTemplatesPath, string studioRoot, IRazorViewEngine engine,
         IRazorViewRendererService renderer, CancellationToken ct)
     {
         var path = GetTemplatePath(templatesDirectory, relativeTemplatesPath, request.Template);
@@ -299,7 +274,7 @@ public static class EmailStudioEndpoints
         try
         {
             var html = await RenderTemplateAsync(path, request.Model, engine, renderer, ct);
-            var logoUrl = GetLogoUrl(studioRoot, customLogoPath);
+            var logoUrl = GetLogoUrl(studioRoot);
             html = html.Replace(EmailLogo.Source, logoUrl, StringComparison.Ordinal);
             return Results.Content(html, "text/html; charset=utf-8");
         }
@@ -314,7 +289,7 @@ public static class EmailStudioEndpoints
     }
 
     private static async Task<IResult> SendAsync(StudioSendRequest request, string templatesDirectory,
-        string relativeTemplatesPath, string? customLogoPath, HttpContext context,
+        string relativeTemplatesPath, HttpContext context,
         IAntiforgery antiforgery, IRazorViewEngine engine, IRazorViewRendererService renderer,
         ILoggerFactory loggerFactory, CancellationToken ct)
     {
@@ -343,7 +318,7 @@ public static class EmailStudioEndpoints
         try
         {
             var html = await RenderTemplateAsync(path, request.Model, engine, renderer, ct);
-            var logoDataUri = await GetLogoDataUriAsync(customLogoPath, ct);
+            var logoDataUri = await GetLogoDataUriAsync(ct);
             html = html.Replace(EmailLogo.Source, logoDataUri, StringComparison.Ordinal);
             await sender.SendHtmlAsync(recipient.Address, request.Subject.Trim(), html, ct);
             return Results.NoContent();
@@ -359,26 +334,12 @@ public static class EmailStudioEndpoints
         }
     }
 
-    private static async Task<string> GetLogoDataUriAsync(string? customLogoPath, CancellationToken ct)
+    private static async Task<string> GetLogoDataUriAsync(CancellationToken ct)
     {
-        byte[] bytes;
-        string contentType;
-        if (customLogoPath is not null)
-        {
-            bytes = await File.ReadAllBytesAsync(customLogoPath, ct);
-            ContentTypes.TryGetContentType(customLogoPath, out var resolvedContentType);
-            contentType = resolvedContentType ?? "application/octet-stream";
-        }
-        else
-        {
-            await using var stream = EmailLogo.Open();
-            using var content = new MemoryStream();
-            await stream.CopyToAsync(content, ct);
-            bytes = content.ToArray();
-            contentType = "image/png";
-        }
-
-        return $"data:{contentType};base64,{Convert.ToBase64String(bytes)}";
+        await using var stream = EmailLogo.Open();
+        using var content = new MemoryStream();
+        await stream.CopyToAsync(content, ct);
+        return $"data:image/png;base64,{Convert.ToBase64String(content.ToArray())}";
     }
 
     private static async Task<string> RenderTemplateAsync(string path, JsonElement model, IRazorViewEngine engine,
