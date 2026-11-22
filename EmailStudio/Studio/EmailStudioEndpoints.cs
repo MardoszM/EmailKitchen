@@ -15,6 +15,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace EmailStudio.Studio;
 
+/// <summary>
+/// Provides extension methods for adding the Email Studio interface and HTTP endpoints to an application.
+/// </summary>
 public static class EmailStudioEndpoints
 {
     private const string Route = "/email-studio";
@@ -35,6 +38,34 @@ public static class EmailStudioEndpoints
         Converters = { new JsonStringEnumConverter() }
     };
 
+    /// <summary>
+    /// Maps the Email Studio interface, assets, template previews, rendering, and test email endpoints
+    /// under <c>/email-studio</c>.
+    /// </summary>
+    /// <param name="app">The application in which to map the Studio endpoints.</param>
+    /// <remarks>
+    /// Register the required services with
+    /// <see cref="EmailStudioServiceCollectionExtensions.AddEmailStudio"/> before building the application.
+    /// The <c>EmailStudioTemplatesPath</c> MSBuild property selects the template directory relative to the
+    /// application's content root; the default is <c>./EmailStudio/Templates</c>.
+    /// Default template files are created if the directory contains no Razor templates.
+    /// This method maps endpoints whenever it is called, so call it inside a development environment check
+    /// if Studio should only be available during development.
+    /// Sending test emails requires a registered <see cref="IEmailSender"/> and a request from a loopback address
+    /// with a valid antiforgery token.
+    /// </remarks>
+    /// <exception cref="ArgumentException">The configured template directory is outside the application's content root.</exception>
+    /// <exception cref="InvalidOperationException">An embedded default template resource is missing.</exception>
+    /// <exception cref="IOException">The default template files cannot be created or written.</exception>
+    /// <exception cref="UnauthorizedAccessException">The application cannot access the template directory.</exception>
+    /// <example>
+    /// <code>
+    /// if (app.Environment.IsDevelopment())
+    /// {
+    ///     app.MapEmailStudio();
+    /// }
+    /// </code>
+    /// </example>
     public static void MapEmailStudio(this WebApplication app)
     {
         var templatesPath = GetConfiguredTemplatesPath();
