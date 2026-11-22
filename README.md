@@ -1,6 +1,6 @@
 # EmailStudio
 
-EmailStudio provides a development email studio for ASP.NET Core applications. It renders the host project's `.cshtml` templates and can optionally send a test message through the host's email sender.
+EmailStudio provides an email template studio for ASP.NET Core applications. It renders the host project's `.cshtml` templates and can optionally send a test message through the host's email sender.
 
 ## Install
 
@@ -36,6 +36,35 @@ if (app.Environment.IsDevelopment())
 ```
 
 The studio is available at `/email-studio` when its endpoints are mapped.
+
+## Authorize production access
+
+`MapEmailStudio()` returns a `RouteGroupBuilder`. Apply `RequireAuthorization(...)` to the returned group to protect every Studio endpoint, including the interface, assets, models, previews, rendering, and test email sending.
+
+The host application provides authentication, policies, and authorization handlers. With authentication already configured, for example using cookies or OpenID Connect, register Studio and a policy:
+
+```csharp
+using EmailStudio.Services;
+
+builder.Services.AddEmailStudio();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("EmailStudioAccess", policy => policy.RequireAuthenticatedUser().RequireRole("Admin"));
+});
+```
+
+After building the application, enable its authentication and authorization middleware and map Studio:
+
+```csharp
+using EmailStudio.Studio;
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapEmailStudio().RequireAuthorization("EmailStudioAccess");
+```
+
+The host application's authorization policy controls access to Studio, including test email sending. Sending test messages requires a valid antiforgery token and a registered `IEmailSender`.
 
 ## Default model for a template
 

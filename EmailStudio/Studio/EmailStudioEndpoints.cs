@@ -1,4 +1,3 @@
-using System.Net;
 using System.Net.Mail;
 using System.Text.Json;
 using System.Reflection;
@@ -7,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using System.Text.Encodings.Web;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc.Razor;
 using System.Text.Json.Serialization;
@@ -43,6 +43,7 @@ public static class EmailStudioEndpoints
     /// under <c>/email-studio</c>.
     /// </summary>
     /// <param name="app">The application in which to map the Studio endpoints.</param>
+    /// <returns>The route group containing all Studio endpoints, allowing authorization policies and other endpoint conventions to be applied.</returns>
     /// <remarks>
     /// Register the required services with
     /// <see cref="EmailStudioServiceCollectionExtensions.AddEmailStudio"/> before building the application.
@@ -51,8 +52,9 @@ public static class EmailStudioEndpoints
     /// Default template files are created if the directory contains no Razor templates.
     /// This method maps endpoints whenever it is called, so call it inside a development environment check
     /// if Studio should only be available during development.
-    /// Sending test emails requires a registered <see cref="IEmailSender"/> and a request from a loopback address
-    /// with a valid antiforgery token.
+    /// Use <c>RequireAuthorization</c> on the returned group to protect the interface, assets, and API endpoints
+    /// with the host application's authorization policy.
+    /// Sending test emails requires a registered <see cref="IEmailSender"/> and a valid antiforgery token.
     /// </remarks>
     /// <exception cref="ArgumentException">The configured template directory is outside the application's content root.</exception>
     /// <exception cref="InvalidOperationException">An embedded default template resource is missing.</exception>
@@ -65,8 +67,12 @@ public static class EmailStudioEndpoints
     ///     app.MapEmailStudio();
     /// }
     /// </code>
+    /// <para>To allow authorized remote access using a policy configured by the host:</para>
+    /// <code>
+    /// app.MapEmailStudio().RequireAuthorization("EmailStudioAccess");
+    /// </code>
     /// </example>
-    public static void MapEmailStudio(this WebApplication app)
+    public static RouteGroupBuilder MapEmailStudio(this WebApplication app)
     {
         var templatesPath = GetConfiguredTemplatesPath();
         var useProjectRoot = templatesPath == ".";
@@ -119,6 +125,8 @@ public static class EmailStudioEndpoints
             GetTemplatePath(templatesDirectory, relativeTemplatesPath, template) is null
                 ? Results.NotFound()
                 : ServeAsset("preview.html", "text/html; charset=utf-8", GetStudioRoot(context)));
+
+        return studio;
     }
 
     private static IResult ServeAsset(string name, string contentType) => Results.File(OpenAsset(name), contentType);
@@ -324,9 +332,6 @@ public static class EmailStudioEndpoints
         IAntiforgery antiforgery, IRazorViewEngine engine, IRazorViewRendererService renderer,
         ILoggerFactory loggerFactory, CancellationToken ct)
     {
-        var address = context.Connection.RemoteIpAddress;
-        if (address is null || !IPAddress.IsLoopback(address.IsIPv4MappedToIPv6 ? address.MapToIPv4() : address))
-            return Results.StatusCode(StatusCodes.Status403Forbidden);
         if (!await antiforgery.IsRequestValidAsync(context))
             return Results.BadRequest("Refresh Email Studio and try again.");
 
