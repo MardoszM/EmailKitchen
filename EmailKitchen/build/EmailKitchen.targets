@@ -1,0 +1,81 @@
+<Project>
+  <PropertyGroup>
+    <EmailKitchenTemplatesPath Condition="'$(EmailKitchenTemplatesPath)' == ''">./EmailKitchen/Templates</EmailKitchenTemplatesPath>
+    <_EmailKitchenTemplatesDirectory>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/$(EmailKitchenTemplatesPath)'))</_EmailKitchenTemplatesDirectory>
+    <_EmailKitchenTemplatesRelativePath>$([System.IO.Path]::GetRelativePath('$(MSBuildProjectDirectory)', '$(_EmailKitchenTemplatesDirectory)'))</_EmailKitchenTemplatesRelativePath>
+    <_EmailKitchenTemplatesSourceDirectory Condition="Exists('$(MSBuildThisFileDirectory)../Kitchen/DefaultTemplates/TestEmail.cshtml')">$(MSBuildThisFileDirectory)../Kitchen/DefaultTemplates</_EmailKitchenTemplatesSourceDirectory>
+    <_EmailKitchenTemplatesSourceDirectory Condition="'$(_EmailKitchenTemplatesSourceDirectory)' == ''">$(MSBuildThisFileDirectory)EmailKitchenTemplates</_EmailKitchenTemplatesSourceDirectory>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(UsingMicrosoftNETSdkWeb)' == 'true' and '$(_EmailKitchenTemplatesRelativePath)' != '.'">
+    <Content Include="$(_EmailKitchenTemplatesRelativePath)/**/*.cshtml"
+             Exclude="@(Content);$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder)" />
+    <Compile Include="$(_EmailKitchenTemplatesRelativePath)/**/*.cs"
+             Exclude="@(Compile);$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder)" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UsingMicrosoftNETSdkWeb)' == 'true' and '$(_EmailKitchenTemplatesRelativePath)' == '.'">
+    <Content Include="**/*.cshtml" Exclude="@(Content);$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder)" />
+    <Compile Include="**/*.cs" Exclude="@(Compile);$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder)" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(UsingMicrosoftNETSdkWeb)' == 'true'">
+    <Content Include="$(_EmailKitchenTemplatesRelativePath)/Translations/*.json"
+             Exclude="@(Content);$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder)"
+             CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Update="$(_EmailKitchenTemplatesRelativePath)/Translations/*.json"
+             CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Analyzer Include="$(MSBuildThisFileDirectory)../../EmailKitchen.Analyzers/bin/$(Configuration)/netstandard2.0/EmailKitchen.Analyzers.dll"
+              Condition="Exists('$(MSBuildThisFileDirectory)../../EmailKitchen.Analyzers/bin/$(Configuration)/netstandard2.0/EmailKitchen.Analyzers.dll')" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(DesignTimeBuild)' == 'true'">
+    <Analyzer Include="$(MSBuildThisFileDirectory)../../EmailKitchen.Analyzers.CodeFixes/bin/$(Configuration)/netstandard2.0/EmailKitchen.Analyzers.CodeFixes.dll"
+              Condition="Exists('$(MSBuildThisFileDirectory)../../EmailKitchen.Analyzers.CodeFixes/bin/$(Configuration)/netstandard2.0/EmailKitchen.Analyzers.CodeFixes.dll')" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(UsingMicrosoftNETSdkWeb)' == 'true'">
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>EmailKitchenTemplatesPath</_Parameter1>
+      <_Parameter2>$(EmailKitchenTemplatesPath)</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <Target Name="ValidateEmailKitchenTemplatesPath">
+    <Error Condition="$([System.IO.Path]::IsPathRooted('$(EmailKitchenTemplatesPath)'))"
+           Text="EmailKitchenTemplatesPath must be relative to the project directory." />
+    <Error Condition="$([System.Text.RegularExpressions.Regex]::IsMatch('$(EmailKitchenTemplatesPath)', '(^|[/\\])\.\.([/\\]|$)'))"
+           Text="EmailKitchenTemplatesPath must stay inside the project directory." />
+  </Target>
+
+  <Target Name="ScaffoldEmailKitchenTemplates"
+          BeforeTargets="ResolveRazorGenerateInputs"
+          DependsOnTargets="ValidateEmailKitchenTemplatesPath"
+          Condition="'$(UsingMicrosoftNETSdkWeb)' == 'true' and '$(IsCrossTargetingBuild)' != 'true'">
+    <ItemGroup>
+      <_EmailKitchenExistingTemplate Include="$(_EmailKitchenTemplatesDirectory)/**/*.cshtml" />
+      <_EmailKitchenDefaultTemplate Include="$(_EmailKitchenTemplatesSourceDirectory)/**/*"
+                                   Condition="'@(_EmailKitchenExistingTemplate)' == ''" />
+    </ItemGroup>
+
+    <MakeDir Directories="$(_EmailKitchenTemplatesDirectory)" />
+    <MakeDir Directories="@(_EmailKitchenDefaultTemplate->'$(_EmailKitchenTemplatesDirectory)/%(RecursiveDir)')" />
+    <Copy SourceFiles="@(_EmailKitchenDefaultTemplate)"
+          DestinationFiles="@(_EmailKitchenDefaultTemplate->'$(_EmailKitchenTemplatesDirectory)/%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
+
+    <ItemGroup>
+      <Content Include="$(_EmailKitchenTemplatesRelativePath)/**/*.cshtml"
+               Exclude="@(Content);$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder)" />
+      <Compile Include="$(_EmailKitchenTemplatesRelativePath)/**/*.cs"
+               Exclude="@(Compile);$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder)" />
+      <Content Include="$(_EmailKitchenTemplatesRelativePath)/Translations/*.json"
+               Exclude="@(Content);$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder)"
+               CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+      <Content Update="$(_EmailKitchenTemplatesRelativePath)/Translations/*.json"
+               CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    </ItemGroup>
+  </Target>
+</Project>

@@ -14,7 +14,7 @@ coverage/
 .idea/
 *.sln.iml
 
-# Visual Studio user-specific files
+# IDE user-specific files
 .vs/
 *.suo
 *.user

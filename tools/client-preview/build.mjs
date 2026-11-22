@@ -5,7 +5,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const directory = path.dirname(fileURLToPath(import.meta.url));
-const assets = path.resolve(directory, "../../EmailStudio/Studio/Assets");
+const assets = path.resolve(directory, "../../EmailKitchen/Kitchen/Assets");
 let removedLimits = 0;
 let preservedColorSchemeRules = false;
 const result = await build({
@@ -20,7 +20,7 @@ const result = await build({
     legalComments: "none",
     metafile: true,
     banner: {
-        js: "// Emailens Engine 0.19.3 (MIT). See third-party-notices.txt for dependency licenses.\n// EmailStudio removes preview caps and preserves authored color-scheme media rules."
+        js: "// Emailens Engine 0.19.3 (MIT). See third-party-notices.txt for dependency licenses.\n// EmailKitchen removes preview caps and preserves authored color-scheme media rules."
     },
     plugins: [
         {
@@ -107,7 +107,7 @@ for (const input of Object.keys(result.metafile.inputs)) {
 const mdn = path.join(directory, "node_modules/mdn-data");
 packages.set(mdn, JSON.parse(await readFile(path.join(mdn, "package.json"), "utf8")));
 const sections = [
-    "Third-party software included in EmailStudio client previews.\n\nEmailens is used locally under its MIT license. No Emailens account or hosted API is used.\nThe EmailStudio build removes its HTML-size and warning-location caps and preserves authored color-scheme media rules."
+    "Third-party software included in EmailKitchen client previews.\n\nEmailens is used locally under its MIT license. No Emailens account or hosted API is used.\nThe EmailKitchen build removes its HTML-size and warning-location caps and preserves authored color-scheme media rules."
 ];
 for (const [folder, metadata] of [...packages].sort((a, b) => a[1].name.localeCompare(b[1].name))) {
     const names = (await readdir(folder)).filter((name) => /^(licen[cs]e|copying|notice)(\.|$|-)/i.test(name));

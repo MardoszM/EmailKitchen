@@ -1,0 +1,74 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <RootNamespace>EmailKitchen</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\EmailKitchen.Analyzers\EmailKitchen.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="all" />
+        <ProjectReference Include="..\EmailKitchen.Analyzers.CodeFixes\EmailKitchen.Analyzers.CodeFixes.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="Kitchen/Assets/*"
+                          LogicalName="EmailKitchen.%(Filename)%(Extension)" />
+        <EmbeddedResource Update="Kitchen/Assets/third-party-notices.txt"
+                          Pack="true" PackagePath="THIRD-PARTY-NOTICES.txt" />
+        <Content Remove="Kitchen/DefaultTemplates/**/*.cshtml" Condition="'$(DesignTimeBuild)' != 'true'" />
+        <Compile Remove="Kitchen/DefaultTemplates/**/*.cs" Condition="'$(DesignTimeBuild)' != 'true'" />
+        <EmbeddedResource Include="Kitchen/DefaultTemplates/Shared/Layout.cshtml"
+                          LogicalName="EmailKitchen.DefaultTemplates.Shared.Layout.cshtml"
+                          Pack="true" PackagePath="build/EmailKitchenTemplates/Shared/Layout.cshtml" />
+        <EmbeddedResource Include="Kitchen/DefaultTemplates/Shared/Layout.cshtml.cs"
+                          LogicalName="EmailKitchen.DefaultTemplates.Shared.Layout.cshtml.cs"
+                          Pack="true" PackagePath="build/EmailKitchenTemplates/Shared/Layout.cshtml.cs" />
+        <EmbeddedResource Include="Kitchen/DefaultTemplates/TestEmail.cshtml"
+                          LogicalName="EmailKitchen.DefaultTemplates.TestEmail.cshtml"
+                          Pack="true" PackagePath="build/EmailKitchenTemplates/TestEmail.cshtml" />
+        <EmbeddedResource Include="Kitchen/DefaultTemplates/TestEmail.cshtml.cs"
+                          LogicalName="EmailKitchen.DefaultTemplates.TestEmail.cshtml.cs"
+                          Pack="true" PackagePath="build/EmailKitchenTemplates/TestEmail.cshtml.cs" />
+        <EmbeddedResource Include="Kitchen/DefaultTemplates/SupportedLanguages.cs"
+                          LogicalName="EmailKitchen.DefaultTemplates.SupportedLanguages.cs"
+                          Pack="true" PackagePath="build/EmailKitchenTemplates/SupportedLanguages.cs" />
+        <EmbeddedResource Include="Kitchen/DefaultTemplates/Translations/eng.json"
+                          LogicalName="EmailKitchen.DefaultTemplates.Translations.eng.json"
+                          Pack="true" PackagePath="build/EmailKitchenTemplates/Translations/eng.json" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="../README.md" Pack="true" PackagePath="README.md" />
+        <None Update="build/EmailKitchen.targets" Pack="true" PackagePath="build/EmailKitchen.targets" />
+        <None Update="buildTransitive/EmailKitchen.targets" Pack="true" PackagePath="buildTransitive/EmailKitchen.targets" />
+    </ItemGroup>
+
+    <PropertyGroup>
+        <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);IncludeEmailKitchenAnalyzerInPackage</TargetsForTfmSpecificContentInPackage>
+    </PropertyGroup>
+
+    <Target Name="IncludeEmailKitchenAnalyzerInPackage">
+        <ItemGroup>
+            <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)../EmailKitchen.Analyzers/bin/$(Configuration)/netstandard2.0/EmailKitchen.Analyzers.dll">
+                <PackagePath>analyzers/dotnet/cs/</PackagePath>
+            </TfmSpecificPackageFile>
+            <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)../EmailKitchen.Analyzers.CodeFixes/bin/$(Configuration)/netstandard2.0/EmailKitchen.Analyzers.CodeFixes.dll">
+                <PackagePath>buildTransitive/EmailKitchen.CodeFixes/</PackagePath>
+            </TfmSpecificPackageFile>
+            <TfmSpecificPackageFile Include="$(NuGetPackageRoot)system.composition.attributedmodel/9.0.0/lib/netstandard2.0/System.Composition.AttributedModel.dll">
+                <PackagePath>buildTransitive/EmailKitchen.CodeFixes/</PackagePath>
+            </TfmSpecificPackageFile>
+            <TfmSpecificPackageFile Include="$(NuGetPackageRoot)system.composition.runtime/9.0.0/lib/netstandard2.0/System.Composition.Runtime.dll">
+                <PackagePath>buildTransitive/EmailKitchen.CodeFixes/</PackagePath>
+            </TfmSpecificPackageFile>
+        </ItemGroup>
+    </Target>
+</Project>
