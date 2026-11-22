@@ -1,6 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
+        <Title>EmailKitchen - Razor email preview for ASP.NET Core</Title>
+        <Authors>Mateusz Mardosz</Authors>
+        <Description>Preview, test, and send Razor email templates in ASP.NET Core. Edit sample data as JSON, render .cshtml to HTML, simulate Gmail and Outlook, and send test emails through your own provider.</Description>
+        <PackageTags>aspnetcore;razor;email;email-template;email-preview;html-email;razor-rendering;email-testing;localization</PackageTags>
+        <PackageProjectUrl>https://github.com/MardoszM/EmailKitchen</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/MardoszM/EmailKitchen.git</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageIcon>emailkitchen-icon.png</PackageIcon>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
@@ -46,14 +55,30 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="../README.md" Pack="true" PackagePath="README.md" />
+        <None Include="../LICENSE" Pack="true" PackagePath="/" />
+        <None Include="../docs/images/emailkitchen-icon.png" Pack="true" PackagePath="emailkitchen-icon.png" />
         <None Update="build/EmailKitchen.targets" Pack="true" PackagePath="build/EmailKitchen.targets" />
         <None Update="buildTransitive/EmailKitchen.targets" Pack="true" PackagePath="buildTransitive/EmailKitchen.targets" />
     </ItemGroup>
 
     <PropertyGroup>
-        <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);IncludeEmailKitchenAnalyzerInPackage</TargetsForTfmSpecificContentInPackage>
+        <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);IncludeEmailKitchenReadmeInPackage;IncludeEmailKitchenAnalyzerInPackage</TargetsForTfmSpecificContentInPackage>
     </PropertyGroup>
+
+    <Target Name="IncludeEmailKitchenReadmeInPackage">
+        <!-- Use public URLs for images and documentation on NuGet.org. -->
+        <PropertyGroup>
+            <_EmailKitchenReadmePath>$(IntermediateOutputPath)nuget/README.md</_EmailKitchenReadmePath>
+            <_EmailKitchenReadmeText>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)../README.md'))</_EmailKitchenReadmeText>
+            <_EmailKitchenReadmeText>$(_EmailKitchenReadmeText.Replace('](docs/images/', '](https://raw.githubusercontent.com/MardoszM/EmailKitchen/main/docs/images/'))</_EmailKitchenReadmeText>
+            <_EmailKitchenReadmeText>$(_EmailKitchenReadmeText.Replace('](docs/configuration.md', '](https://github.com/MardoszM/EmailKitchen/blob/main/docs/configuration.md'))</_EmailKitchenReadmeText>
+        </PropertyGroup>
+        <WriteLinesToFile File="$(_EmailKitchenReadmePath)" Lines="$([MSBuild]::Escape($(_EmailKitchenReadmeText.TrimEnd())))"
+                          Overwrite="true" WriteOnlyWhenDifferent="true" />
+        <ItemGroup>
+            <TfmSpecificPackageFile Include="$(_EmailKitchenReadmePath)" PackagePath="$(PackageReadmeFile)" />
+        </ItemGroup>
+    </Target>
 
     <Target Name="IncludeEmailKitchenAnalyzerInPackage">
         <ItemGroup>
