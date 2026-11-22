@@ -7,88 +7,101 @@
     var lang = Model.Language.ToString();
     ViewData["Title"] = T.T("testEmail.title", lang);
     ViewData["Preheader"] = Model.Preheader ?? T.T("testEmail.preheader", lang);
+
+    (string Name, string Url, string Badge, string Color, string DescriptionKey)[] resources =
+    [
+        ("Google", "https://www.google.com/", "G", "#14376e", "testEmail.resources.google"),
+        ("LinkedIn", "https://www.linkedin.com/", "in", "#043e73", "testEmail.resources.linkedin"),
+        ("GitHub", "https://github.com/", "GH", "#293648", "testEmail.resources.github"),
+        ("Wikipedia", "https://www.wikipedia.org/", "W", "#423478", "testEmail.resources.wikipedia"),
+        ("Microsoft", "https://www.microsoft.com/", "M", "#0e4225", "testEmail.resources.microsoft")
+    ];
 }
 
-<p class="email-eyebrow" style="margin:0 0 8px; color:#0f766e; font-family:Arial,Helvetica,sans-serif; font-size:11px; line-height:16px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase;">
-    @T.T("testEmail.eyebrow", lang)
-</p>
-<h1 class="email-heading" style="margin:0 0 12px; color:#101828; font-family:Arial,Helvetica,sans-serif; font-size:28px; line-height:34px; font-weight:700;">
-    @T.T("testEmail.greeting", lang, Model.Name ?? string.Empty)
-</h1>
-<p class="email-message" style="margin:0; color:#475569; font-family:Arial,Helvetica,sans-serif; font-size:15px; line-height:24px;">
-    @(Model.Message ?? T.T("testEmail.message", lang))
-</p>
-
-<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="resource-card"
-       style="margin-top:26px; background-color:#f8fafc; border:1px solid #e5e7eb; border-radius:12px;">
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+       style="font-family:Arial,Helvetica,sans-serif;">
     <tr>
-        <td style="padding:20px 20px 8px;">
-            <p class="resource-section-heading" style="margin:0 0 6px; color:#0f766e; font-family:Arial,Helvetica,sans-serif; font-size:11px; line-height:16px; font-weight:700; letter-spacing:1px; text-transform:uppercase;">
-                @T.T("testEmail.resources.title", lang)
-            </p>
-            <p class="resource-section-copy" style="margin:0; color:#475569; font-family:Arial,Helvetica,sans-serif; font-size:13px; line-height:20px;">
-                @T.T("testEmail.resources.description", lang)
+        <td style="padding:0 0 8px;">
+            <p class="email-eyebrow" style="margin:0; color:#0d4540; font-size:11px; line-height:16px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase;">
+                @T.T("testEmail.eyebrow", lang)
             </p>
         </td>
     </tr>
     <tr>
-        <td style="padding:0 20px 12px;">
-            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+        <td style="padding:0 0 12px;">
+            <h1 class="email-heading" style="margin:0; color:#101828; font-size:28px; line-height:34px; font-weight:700;">
+                @T.T("testEmail.greeting", lang, Model.Name ?? string.Empty)
+            </h1>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding:0 0 24px;">
+            <p class="email-message" style="margin:0; color:#303e50; font-size:15px; line-height:24px;">
+                @(Model.Message ?? T.T("testEmail.message", lang))
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" bgcolor="#f8fafc"
+                   class="resource-card" style="background-color:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-family:Arial,Helvetica,sans-serif;">
                 <tr>
-                    <td class="resource-row" width="42" valign="top" style="padding:14px 0; border-top:1px solid #e5e7eb;">
-                        <span class="resource-badge resource-badge-google" style="display:inline-block; padding:5px 8px; border-radius:7px; background-color:#4285f4; color:#ffffff; font-family:Arial,Helvetica,sans-serif; font-size:12px; line-height:16px; font-weight:700;">G</span>
+                    <td style="padding:16px 16px 6px;">
+                        <p class="resource-section-heading" style="margin:0; color:#0d4540; font-size:11px; line-height:16px; font-weight:700; letter-spacing:1px; text-transform:uppercase;">
+                            @T.T("testEmail.resources.title", lang)
+                        </p>
                     </td>
-                    <td class="resource-row" style="padding:14px 8px; border-top:1px solid #e5e7eb; font-family:Arial,Helvetica,sans-serif;">
-                        <a class="resource-link" href="https://www.google.com/" target="_blank" rel="noopener noreferrer" style="color:#0f172a; font-size:14px; line-height:20px; font-weight:700; text-decoration:underline;">Google</a>
-                        <div class="resource-description" style="margin-top:2px; color:#64748b; font-size:12px; line-height:18px;">@T.T("testEmail.resources.google", lang)</div>
-                    </td>
-                    <td class="resource-row resource-arrow" align="right" style="padding:0; border-top:1px solid #e5e7eb; color:#0f766e; font-family:Arial,Helvetica,sans-serif; font-size:16px;"><a href="https://www.google.com/" target="_blank" rel="noopener noreferrer" aria-label="@T.T("testEmail.resources.open", lang, "Google")" style="display:block; padding:14px 0 14px 12px; color:inherit; text-decoration:none;">↗</a></td>
                 </tr>
                 <tr>
-                    <td class="resource-row" width="42" valign="top" style="padding:14px 0; border-top:1px solid #e5e7eb;">
-                        <span class="resource-badge resource-badge-linkedin" style="display:inline-block; padding:5px 8px; border-radius:7px; background-color:#0a66c2; color:#ffffff; font-family:Arial,Helvetica,sans-serif; font-size:12px; line-height:16px; font-weight:700;">in</span>
+                    <td style="padding:0 16px 10px;">
+                        <p class="resource-section-copy" style="margin:0; color:#303e50; font-size:13px; line-height:20px;">
+                            @T.T("testEmail.resources.description", lang)
+                        </p>
                     </td>
-                    <td class="resource-row" style="padding:14px 8px; border-top:1px solid #e5e7eb; font-family:Arial,Helvetica,sans-serif;">
-                        <a class="resource-link" href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer" style="color:#0f172a; font-size:14px; line-height:20px; font-weight:700; text-decoration:underline;">LinkedIn</a>
-                        <div class="resource-description" style="margin-top:2px; color:#64748b; font-size:12px; line-height:18px;">@T.T("testEmail.resources.linkedin", lang)</div>
-                    </td>
-                    <td class="resource-row resource-arrow" align="right" style="padding:0; border-top:1px solid #e5e7eb; color:#0f766e; font-family:Arial,Helvetica,sans-serif; font-size:16px;"><a href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer" aria-label="@T.T("testEmail.resources.open", lang, "LinkedIn")" style="display:block; padding:14px 0 14px 12px; color:inherit; text-decoration:none;">↗</a></td>
                 </tr>
                 <tr>
-                    <td class="resource-row" width="42" valign="top" style="padding:14px 0; border-top:1px solid #e5e7eb;">
-                        <span class="resource-badge resource-badge-github" style="display:inline-block; padding:5px 8px; border-radius:7px; background-color:#334155; color:#ffffff; font-family:Arial,Helvetica,sans-serif; font-size:12px; line-height:16px; font-weight:700;">GH</span>
+                    <td style="padding:0 16px 4px;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+                               style="font-family:Arial,Helvetica,sans-serif;">
+                            @foreach (var resource in resources)
+                            {
+                                <tr>
+                                    <td class="resource-row" width="36" valign="top" style="padding:12px 0; border-top:1px solid #e5e7eb;">
+                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="28">
+                                            <tr>
+                                                <td class="resource-badge resource-badge-@(resource.Name.ToLowerInvariant())" align="center" valign="middle" width="28" height="24" bgcolor="@resource.Color"
+                                                    style="width:28px; height:24px; background-color:@resource.Color; border-radius:6px; color:#ffffff; font-family:Arial,Helvetica,sans-serif; font-size:12px; line-height:16px; font-weight:700;">
+                                                    @resource.Badge
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td class="resource-row" valign="top" style="padding:12px 0; border-top:1px solid #e5e7eb;">
+                                        <a class="resource-link" href="@resource.Url" target="_blank" rel="noopener noreferrer"
+                                           style="color:#0f172a; font-size:14px; line-height:20px; font-weight:700; text-decoration:underline;">@resource.Name</a>
+                                        <p class="resource-description" style="margin:0; color:#34404c; font-size:12px; line-height:18px;">
+                                            @T.T(resource.DescriptionKey, lang)
+                                        </p>
+                                    </td>
+                                    <td class="resource-row" width="24" align="right" valign="top"
+                                        style="padding:12px 0; border-top:1px solid #e5e7eb; font-size:16px; line-height:20px;">
+                                        <a class="resource-arrow" href="@resource.Url" target="_blank" rel="noopener noreferrer"
+                                           aria-label="@T.T("testEmail.resources.open", lang, resource.Name)"
+                                           style="color:#0d4540; text-decoration:none;">↗</a>
+                                    </td>
+                                </tr>
+                            }
+                        </table>
                     </td>
-                    <td class="resource-row" style="padding:14px 8px; border-top:1px solid #e5e7eb; font-family:Arial,Helvetica,sans-serif;">
-                        <a class="resource-link" href="https://github.com/" target="_blank" rel="noopener noreferrer" style="color:#0f172a; font-size:14px; line-height:20px; font-weight:700; text-decoration:underline;">GitHub</a>
-                        <div class="resource-description" style="margin-top:2px; color:#64748b; font-size:12px; line-height:18px;">@T.T("testEmail.resources.github", lang)</div>
-                    </td>
-                    <td class="resource-row resource-arrow" align="right" style="padding:0; border-top:1px solid #e5e7eb; color:#0f766e; font-family:Arial,Helvetica,sans-serif; font-size:16px;"><a href="https://github.com/" target="_blank" rel="noopener noreferrer" aria-label="@T.T("testEmail.resources.open", lang, "GitHub")" style="display:block; padding:14px 0 14px 12px; color:inherit; text-decoration:none;">↗</a></td>
-                </tr>
-                <tr>
-                    <td class="resource-row" width="42" valign="top" style="padding:14px 0; border-top:1px solid #e5e7eb;">
-                        <span class="resource-badge resource-badge-wikipedia" style="display:inline-block; padding:5px 8px; border-radius:7px; background-color:#6257a5; color:#ffffff; font-family:Arial,Helvetica,sans-serif; font-size:12px; line-height:16px; font-weight:700;">W</span>
-                    </td>
-                    <td class="resource-row" style="padding:14px 8px; border-top:1px solid #e5e7eb; font-family:Arial,Helvetica,sans-serif;">
-                        <a class="resource-link" href="https://www.wikipedia.org/" target="_blank" rel="noopener noreferrer" style="color:#0f172a; font-size:14px; line-height:20px; font-weight:700; text-decoration:underline;">Wikipedia</a>
-                        <div class="resource-description" style="margin-top:2px; color:#64748b; font-size:12px; line-height:18px;">@T.T("testEmail.resources.wikipedia", lang)</div>
-                    </td>
-                    <td class="resource-row resource-arrow" align="right" style="padding:0; border-top:1px solid #e5e7eb; color:#0f766e; font-family:Arial,Helvetica,sans-serif; font-size:16px;"><a href="https://www.wikipedia.org/" target="_blank" rel="noopener noreferrer" aria-label="@T.T("testEmail.resources.open", lang, "Wikipedia")" style="display:block; padding:14px 0 14px 12px; color:inherit; text-decoration:none;">↗</a></td>
-                </tr>
-                <tr>
-                    <td class="resource-row" width="42" valign="top" style="padding:14px 0; border-top:1px solid #e5e7eb;">
-                        <span class="resource-badge resource-badge-microsoft" style="display:inline-block; padding:5px 8px; border-radius:7px; background-color:#16833b; color:#ffffff; font-family:Arial,Helvetica,sans-serif; font-size:12px; line-height:16px; font-weight:700;">M</span>
-                    </td>
-                    <td class="resource-row" style="padding:14px 8px; border-top:1px solid #e5e7eb; font-family:Arial,Helvetica,sans-serif;">
-                        <a class="resource-link" href="https://www.microsoft.com/" target="_blank" rel="noopener noreferrer" style="color:#0f172a; font-size:14px; line-height:20px; font-weight:700; text-decoration:underline;">Microsoft</a>
-                        <div class="resource-description" style="margin-top:2px; color:#64748b; font-size:12px; line-height:18px;">@T.T("testEmail.resources.microsoft", lang)</div>
-                    </td>
-                    <td class="resource-row resource-arrow" align="right" style="padding:0; border-top:1px solid #e5e7eb; color:#0f766e; font-family:Arial,Helvetica,sans-serif; font-size:16px;"><a href="https://www.microsoft.com/" target="_blank" rel="noopener noreferrer" aria-label="@T.T("testEmail.resources.open", lang, "Microsoft")" style="display:block; padding:14px 0 14px 12px; color:inherit; text-decoration:none;">↗</a></td>
                 </tr>
             </table>
         </td>
     </tr>
+    <tr>
+        <td style="padding:20px 0 0;">
+            <p class="email-signoff" style="margin:0; color:#303e50; font-size:13px; line-height:20px;">
+                @T.T("testEmail.signoff", lang)
+            </p>
+        </td>
+    </tr>
 </table>
-
-<p class="email-signoff" style="margin:22px 0 0; color:#475569; font-family:Arial,Helvetica,sans-serif; font-size:13px; line-height:20px;">
-    @T.T("testEmail.signoff", lang)
-</p>

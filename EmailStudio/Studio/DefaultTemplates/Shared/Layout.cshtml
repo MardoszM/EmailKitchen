@@ -10,6 +10,8 @@
     var title = ViewData["Title"] as string ?? brandName;
     var preheader = ViewData["Preheader"] as string ?? string.Empty;
     var footerText = layoutModel?.FooterText ?? T.T("layout.footer", lang, brandName);
+    const int cardWidth = 600;
+    const int headerHeight = 94;
 }
 <!doctype html>
 <html lang="@T.T("layout.language", lang)" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml"
@@ -42,7 +44,7 @@
         }
 
         .email-eyebrow, .resource-section-heading {
-            color: #0f766e;
+            color: #0d4540;
         }
 
         .email-heading {
@@ -50,7 +52,7 @@
         }
 
         .email-message, .resource-section-copy, .email-signoff {
-            color: #475569;
+            color: #303e50;
         }
 
         .resource-card {
@@ -62,36 +64,16 @@
             border-top-color: #e5e7eb;
         }
 
-        .resource-badge-google {
-            background-color: #4285f4;
-        }
-
-        .resource-badge-linkedin {
-            background-color: #0a66c2;
-        }
-
-        .resource-badge-github {
-            background-color: #334155;
-        }
-
-        .resource-badge-wikipedia {
-            background-color: #6257a5;
-        }
-
-        .resource-badge-microsoft {
-            background-color: #16833b;
-        }
-
         .resource-link {
             color: #0f172a;
         }
 
         .resource-description {
-            color: #64748b;
+            color: #34404c;
         }
 
         .resource-arrow {
-            color: #0f766e;
+            color: #0d4540;
         }
 
         @@media (prefers-color-scheme: dark) {
@@ -117,7 +99,7 @@
             }
 
             .email-eyebrow, .resource-section-heading, .resource-arrow {
-                color: #6ee7d1 !important;
+                color: #99f1dc !important;
             }
 
             .email-heading {
@@ -137,32 +119,36 @@
                 border-top-color: #52677f !important;
             }
 
+            .resource-badge {
+                color: #ffffff !important;
+            }
+
+            .resource-badge-google {
+                background-color: #245bb5 !important;
+            }
+
+            .resource-badge-linkedin {
+                background-color: #0a66c2 !important;
+            }
+
+            .resource-badge-github {
+                background-color: #334155 !important;
+            }
+
+            .resource-badge-wikipedia {
+                background-color: #6257a5 !important;
+            }
+
+            .resource-badge-microsoft {
+                background-color: #16833b !important;
+            }
+
             .resource-link {
                 color: #ffffff !important;
             }
 
             .resource-description {
                 color: #d0d9e5 !important;
-            }
-
-            .resource-badge-google {
-                background-color: #4285f4 !important;
-            }
-
-            .resource-badge-linkedin {
-                background-color: #2782dc !important;
-            }
-
-            .resource-badge-github {
-                background-color: #8998ad !important;
-            }
-
-            .resource-badge-wikipedia {
-                background-color: #8b7cf6 !important;
-            }
-
-            .resource-badge-microsoft {
-                background-color: #22a447 !important;
             }
 
             .footer {
@@ -172,6 +158,9 @@
         }
     </style>
     <!--[if mso]>
+    <style>
+        table { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    </style>
     <xml>
         <o:OfficeDocumentSettings>
             <o:PixelsPerInch>96</o:PixelsPerInch>
@@ -185,31 +174,47 @@
     style="display:none; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden; mso-hide:all;">
     @preheader
 </div>
-<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="page"
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" bgcolor="#f3f4f6" class="page"
        style="background-color:#f3f4f6;">
     <tr>
         <td align="center" style="padding:24px 12px;">
             <!--[if mso]>
-            <table role="presentation" width="760">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center"
+                   width="@cardWidth" style="width:@(cardWidth)px;">
                 <tr>
                     <td><![endif]-->
-            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="card"
-                   style="max-width:760px; background-color:#ffffff; border-radius:14px; overflow:hidden;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" width="100%"
+                   bgcolor="#ffffff" class="card" style="max-width:@(cardWidth)px; background-color:#ffffff; border-radius:14px; overflow:hidden;">
                 <tr>
-                    <td align="center" class="email-header" style="padding:22px 24px; background-color:#101828;">
-                        <img src="@EmailLogo.Source" alt="@brandName" title="@brandName"
-                             style="display:block; height:auto; max-width:100%; max-height:50px; border:0; outline:none; text-decoration:none;"/>
+                    <td align="center" bgcolor="#101828" class="email-header" style="background-color:#101828;">
+                        @* Outlook Classic preserves the VML fill when it inverts the table colors. *@
+                        <!--[if mso]>
+                        <v:rect fill="true" fillcolor="#101828" stroke="false" style="width:@(cardWidth)px; height:@(headerHeight)px;">
+                            <v:textbox inset="0,0,0,0">
+                        <![endif]-->
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                            <tr>
+                                <td align="center" valign="middle" height="@headerHeight" style="height:@(headerHeight)px;">
+                                    <img src="@EmailLogo.Source" width="150" height="50" alt="@brandName" title="@brandName"
+                                         style="display:block; width:150px; height:50px; border:0; color:#ffffff; font-family:Arial,Helvetica,sans-serif; font-size:15px;"/>
+                                </td>
+                            </tr>
+                        </table>
+                        <!--[if mso]>
+                            </v:textbox>
+                        </v:rect>
+                        <![endif]-->
                     </td>
                 </tr>
                 <tr>
-                    <td class="body-copy"
-                        style="padding:28px 26px; background-color:#ffffff; color:#111827; font-family:Arial,Helvetica,sans-serif; font-size:15px; line-height:23px;">
+                    <td bgcolor="#ffffff" class="body-copy"
+                        style="padding:24px 20px; background-color:#ffffff; color:#111827; font-family:Arial,Helvetica,sans-serif; font-size:15px; line-height:23px;">
                         @RenderBody()
                     </td>
                 </tr>
                 <tr>
-                    <td class="footer"
-                        style="padding:18px 24px; background-color:#f8fafc; color:#64748b; font-family:Arial,Helvetica,sans-serif; font-size:12px; line-height:18px;">
+                    <td bgcolor="#f8fafc" class="footer"
+                        style="padding:18px 20px; background-color:#f8fafc; color:#34404c; font-family:Arial,Helvetica,sans-serif; font-size:12px; line-height:18px;">
                         @footerText
                     </td>
                 </tr>

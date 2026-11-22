@@ -1,7 +1,7 @@
 Third-party software included in EmailStudio client previews.
 
 Emailens is used locally under its MIT license. No Emailens account or hosted API is used.
-The EmailStudio build changes its HTML-size and warning-location caps.
+The EmailStudio build removes its HTML-size and warning-location caps and preserves authored color-scheme media rules.
 
 ========================================================================
 

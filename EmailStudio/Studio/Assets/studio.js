@@ -1,3 +1,4 @@
+import { clientProfiles } from "./client-profiles.js";
 import { createClientPreview } from "./client-preview.js";
 
 const root = "__EMAIL_STUDIO_ROOT__";
@@ -169,16 +170,19 @@ function initializePreviewWidth() {
     });
 }
 
-function applyPreviewTheme(preview = frame.contentDocument) {
+function applyPreviewTheme(previewFrame = frame) {
+    const preview = previewFrame.contentDocument;
     if (!preview)
         return;
 
     const theme = document.documentElement.dataset.theme;
     preview.documentElement.style.colorScheme = theme;
+    const client = clientProfiles.find(profile => profile.id === previewFrame.dataset.client);
+    const mediaTheme = client?.ignoresColorScheme ? null : theme;
     // Evaluate theme queries for the preview even when the browser reports its system theme inside the iframe.
     for (const sheet of preview.styleSheets) {
         try {
-            applyThemeQueries(sheet.cssRules, theme);
+            applyThemeQueries(sheet.cssRules, mediaTheme);
         } catch (error) {
             if (error.name !== "SecurityError")
                 throw error;
@@ -190,12 +194,12 @@ function applyThemeQueries(rules, theme) {
     for (const rule of rules) {
         if (rule.type === CSSRule.MEDIA_RULE) {
             const original = originalMediaQueries.get(rule) ?? rule.media.mediaText;
-            const updated = original.replace(/\(prefers-color-scheme:\s*(light|dark)\)/gi,
+            const updated = original.replace(/\(\s*prefers-color-scheme\s*:\s*(light|dark)\s*\)/gi,
                 (_, scheme) => scheme.toLowerCase() === theme ? "(min-width: 0px)" : "(width < 0px)");
-            if (original !== updated) {
+            const media = theme === null && original !== updated ? "not all" : updated;
+            if (rule.media.mediaText !== media) {
                 originalMediaQueries.set(rule, original);
-                if (rule.media.mediaText !== updated)
-                    rule.media.mediaText = updated;
+                rule.media.mediaText = media;
             }
         }
         if (rule.cssRules)
@@ -255,12 +259,14 @@ function cancelPendingPreview() {
     pendingFrame = null;
 }
 
-function setPreviewHtml(html, preserveScroll, onReady) {
+function setPreviewHtml(html, preserveScroll, onReady, client) {
     if (html === null) {
         frame.removeAttribute("srcdoc");
         return;
     }
     if (frame.srcdoc === html) {
+        frame.dataset.client = client;
+        applyPreviewTheme();
         onReady();
         return;
     }
@@ -270,6 +276,7 @@ function setPreviewHtml(html, preserveScroll, onReady) {
     next.removeAttribute("id");
     next.classList.add("preview-frame-pending");
     next.inert = true;
+    next.dataset.client = client;
     next.srcdoc = html;
     pendingFrame = next;
     next.addEventListener("load", () => {
@@ -277,7 +284,7 @@ function setPreviewHtml(html, preserveScroll, onReady) {
             return;
 
         const scroll = preserveScroll ? frame.contentDocument?.scrollingElement : null;
-        applyPreviewTheme(next.contentDocument);
+        applyPreviewTheme(next);
         if (scroll) {
             next.contentDocument?.scrollingElement?.scrollTo({
                 top: scroll.scrollTop,

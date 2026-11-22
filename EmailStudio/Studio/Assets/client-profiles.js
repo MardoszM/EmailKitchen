@@ -2,86 +2,107 @@
 export const clientProfiles = [
   {
     "id": "gmail-web",
-    "name": "Gmail"
+    "name": "Gmail",
+    "ignoresColorScheme": true
   },
   {
     "id": "gmail-android",
-    "name": "Gmail Android"
+    "name": "Gmail Android",
+    "ignoresColorScheme": true
   },
   {
     "id": "gmail-ios",
-    "name": "Gmail iOS"
+    "name": "Gmail iOS",
+    "ignoresColorScheme": true
   },
   {
     "id": "outlook-web",
-    "name": "Outlook 365"
+    "name": "Outlook 365",
+    "ignoresColorScheme": false
   },
   {
     "id": "outlook-windows",
-    "name": "Outlook (New)"
+    "name": "Outlook (New)",
+    "ignoresColorScheme": false
   },
   {
     "id": "outlook-windows-legacy",
-    "name": "Outlook Classic"
+    "name": "Outlook Classic",
+    "ignoresColorScheme": true
   },
   {
     "id": "outlook-ios",
-    "name": "Outlook iOS"
+    "name": "Outlook iOS",
+    "ignoresColorScheme": false
   },
   {
     "id": "outlook-android",
-    "name": "Outlook Android"
+    "name": "Outlook Android",
+    "ignoresColorScheme": false
   },
   {
     "id": "outlook-macos",
-    "name": "Outlook for Mac"
+    "name": "Outlook for Mac",
+    "ignoresColorScheme": false
   },
   {
     "id": "apple-mail-macos",
-    "name": "Apple Mail"
+    "name": "Apple Mail",
+    "ignoresColorScheme": false
   },
   {
     "id": "apple-mail-ios",
-    "name": "Apple Mail iOS"
+    "name": "Apple Mail iOS",
+    "ignoresColorScheme": false
   },
   {
     "id": "yahoo-mail",
-    "name": "Yahoo Mail"
+    "name": "Yahoo Mail",
+    "ignoresColorScheme": true
   },
   {
     "id": "yahoo-mail-android",
-    "name": "Yahoo Mail Android"
+    "name": "Yahoo Mail Android",
+    "ignoresColorScheme": true
   },
   {
     "id": "yahoo-mail-ios",
-    "name": "Yahoo Mail iOS"
+    "name": "Yahoo Mail iOS",
+    "ignoresColorScheme": true
   },
   {
     "id": "samsung-mail",
-    "name": "Samsung Mail"
+    "name": "Samsung Mail",
+    "ignoresColorScheme": false
   },
   {
     "id": "thunderbird",
-    "name": "Thunderbird"
+    "name": "Thunderbird",
+    "ignoresColorScheme": true
   },
   {
     "id": "hey-mail",
-    "name": "HEY Mail"
+    "name": "HEY Mail",
+    "ignoresColorScheme": true
   },
   {
     "id": "protonmail",
-    "name": "Proton Mail"
+    "name": "Proton Mail",
+    "ignoresColorScheme": true
   },
   {
     "id": "aol",
-    "name": "AOL Mail"
+    "name": "AOL Mail",
+    "ignoresColorScheme": true
   },
   {
     "id": "fastmail",
-    "name": "Fastmail"
+    "name": "Fastmail",
+    "ignoresColorScheme": false
   },
   {
     "id": "superhuman",
-    "name": "Superhuman"
+    "name": "Superhuman",
+    "ignoresColorScheme": false
   }
 ];

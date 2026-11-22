@@ -115,10 +115,11 @@ export function createClientPreview({ surface, onRender, cancelPendingRender, re
     }
 
     function commit(html, preserveScroll, state, warnings = []) {
+        const client = state === "simulation" ? selected : "browser";
         onRender(html, preserveScroll, () => {
             updateNotice(state);
             showWarnings(warnings);
-        });
+        }, client);
     }
 
     function render(preserveScroll = true) {
