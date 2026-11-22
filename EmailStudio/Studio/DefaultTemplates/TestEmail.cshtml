@@ -1,19 +1,22 @@
+@using EmailStudio.Services
 @model EmailStudio.Templates.TestEmailModel
+@inject IEmailTranslator T
 @{
     Layout = "Shared/Layout.cshtml";
     ViewData["EmailStudioLayout"] = Model;
-    ViewData["Title"] = "Welcome — a few good places to start";
-    ViewData["Preheader"] = Model.Preheader;
+    var lang = Model.Language.ToString();
+    ViewData["Title"] = T.T("testEmail.title", lang);
+    ViewData["Preheader"] = Model.Preheader ?? T.T("testEmail.preheader", lang);
 }
 
 <p class="email-eyebrow" style="margin:0 0 8px; color:#0f766e; font-family:Arial,Helvetica,sans-serif; font-size:11px; line-height:16px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase;">
-    A quick welcome
+    @T.T("testEmail.eyebrow", lang)
 </p>
 <h1 class="email-heading" style="margin:0 0 12px; color:#101828; font-family:Arial,Helvetica,sans-serif; font-size:28px; line-height:34px; font-weight:700;">
-    Hello @Model.Name,
+    @T.T("testEmail.greeting", lang, Model.Name ?? string.Empty)
 </h1>
 <p class="email-message" style="margin:0; color:#475569; font-family:Arial,Helvetica,sans-serif; font-size:15px; line-height:24px;">
-    @Model.Message
+    @(Model.Message ?? T.T("testEmail.message", lang))
 </p>
 
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="resource-card"
@@ -21,10 +24,10 @@
     <tr>
         <td style="padding:20px 20px 8px;">
             <p class="resource-section-heading" style="margin:0 0 6px; color:#0f766e; font-family:Arial,Helvetica,sans-serif; font-size:11px; line-height:16px; font-weight:700; letter-spacing:1px; text-transform:uppercase;">
-                A few good places to start
+                @T.T("testEmail.resources.title", lang)
             </p>
             <p class="resource-section-copy" style="margin:0; color:#475569; font-family:Arial,Helvetica,sans-serif; font-size:13px; line-height:20px;">
-                Pick a link, follow an idea, and see where it takes you.
+                @T.T("testEmail.resources.description", lang)
             </p>
         </td>
     </tr>
@@ -37,9 +40,9 @@
                     </td>
                     <td class="resource-row" style="padding:14px 8px; border-top:1px solid #e5e7eb; font-family:Arial,Helvetica,sans-serif;">
                         <a class="resource-link" href="https://www.google.com/" target="_blank" rel="noopener noreferrer" style="color:#0f172a; font-size:14px; line-height:20px; font-weight:700; text-decoration:underline;">Google</a>
-                        <div class="resource-description" style="margin-top:2px; color:#64748b; font-size:12px; line-height:18px;">Search for your next idea</div>
+                        <div class="resource-description" style="margin-top:2px; color:#64748b; font-size:12px; line-height:18px;">@T.T("testEmail.resources.google", lang)</div>
                     </td>
-                    <td class="resource-row resource-arrow" align="right" style="padding:0; border-top:1px solid #e5e7eb; color:#0f766e; font-family:Arial,Helvetica,sans-serif; font-size:16px;"><a href="https://www.google.com/" target="_blank" rel="noopener noreferrer" aria-label="Open Google" style="display:block; padding:14px 0 14px 12px; color:inherit; text-decoration:none;">↗</a></td>
+                    <td class="resource-row resource-arrow" align="right" style="padding:0; border-top:1px solid #e5e7eb; color:#0f766e; font-family:Arial,Helvetica,sans-serif; font-size:16px;"><a href="https://www.google.com/" target="_blank" rel="noopener noreferrer" aria-label="@T.T("testEmail.resources.open", lang, "Google")" style="display:block; padding:14px 0 14px 12px; color:inherit; text-decoration:none;">↗</a></td>
                 </tr>
                 <tr>
                     <td class="resource-row" width="42" valign="top" style="padding:14px 0; border-top:1px solid #e5e7eb;">
@@ -47,9 +50,9 @@
                     </td>
                     <td class="resource-row" style="padding:14px 8px; border-top:1px solid #e5e7eb; font-family:Arial,Helvetica,sans-serif;">
                         <a class="resource-link" href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer" style="color:#0f172a; font-size:14px; line-height:20px; font-weight:700; text-decoration:underline;">LinkedIn</a>
-                        <div class="resource-description" style="margin-top:2px; color:#64748b; font-size:12px; line-height:18px;">Meet people and follow your field</div>
+                        <div class="resource-description" style="margin-top:2px; color:#64748b; font-size:12px; line-height:18px;">@T.T("testEmail.resources.linkedin", lang)</div>
                     </td>
-                    <td class="resource-row resource-arrow" align="right" style="padding:0; border-top:1px solid #e5e7eb; color:#0f766e; font-family:Arial,Helvetica,sans-serif; font-size:16px;"><a href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer" aria-label="Open LinkedIn" style="display:block; padding:14px 0 14px 12px; color:inherit; text-decoration:none;">↗</a></td>
+                    <td class="resource-row resource-arrow" align="right" style="padding:0; border-top:1px solid #e5e7eb; color:#0f766e; font-family:Arial,Helvetica,sans-serif; font-size:16px;"><a href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer" aria-label="@T.T("testEmail.resources.open", lang, "LinkedIn")" style="display:block; padding:14px 0 14px 12px; color:inherit; text-decoration:none;">↗</a></td>
                 </tr>
                 <tr>
                     <td class="resource-row" width="42" valign="top" style="padding:14px 0; border-top:1px solid #e5e7eb;">
@@ -57,9 +60,9 @@
                     </td>
                     <td class="resource-row" style="padding:14px 8px; border-top:1px solid #e5e7eb; font-family:Arial,Helvetica,sans-serif;">
                         <a class="resource-link" href="https://github.com/" target="_blank" rel="noopener noreferrer" style="color:#0f172a; font-size:14px; line-height:20px; font-weight:700; text-decoration:underline;">GitHub</a>
-                        <div class="resource-description" style="margin-top:2px; color:#64748b; font-size:12px; line-height:18px;">Discover projects and makers</div>
+                        <div class="resource-description" style="margin-top:2px; color:#64748b; font-size:12px; line-height:18px;">@T.T("testEmail.resources.github", lang)</div>
                     </td>
-                    <td class="resource-row resource-arrow" align="right" style="padding:0; border-top:1px solid #e5e7eb; color:#0f766e; font-family:Arial,Helvetica,sans-serif; font-size:16px;"><a href="https://github.com/" target="_blank" rel="noopener noreferrer" aria-label="Open GitHub" style="display:block; padding:14px 0 14px 12px; color:inherit; text-decoration:none;">↗</a></td>
+                    <td class="resource-row resource-arrow" align="right" style="padding:0; border-top:1px solid #e5e7eb; color:#0f766e; font-family:Arial,Helvetica,sans-serif; font-size:16px;"><a href="https://github.com/" target="_blank" rel="noopener noreferrer" aria-label="@T.T("testEmail.resources.open", lang, "GitHub")" style="display:block; padding:14px 0 14px 12px; color:inherit; text-decoration:none;">↗</a></td>
                 </tr>
                 <tr>
                     <td class="resource-row" width="42" valign="top" style="padding:14px 0; border-top:1px solid #e5e7eb;">
@@ -67,9 +70,9 @@
                     </td>
                     <td class="resource-row" style="padding:14px 8px; border-top:1px solid #e5e7eb; font-family:Arial,Helvetica,sans-serif;">
                         <a class="resource-link" href="https://www.wikipedia.org/" target="_blank" rel="noopener noreferrer" style="color:#0f172a; font-size:14px; line-height:20px; font-weight:700; text-decoration:underline;">Wikipedia</a>
-                        <div class="resource-description" style="margin-top:2px; color:#64748b; font-size:12px; line-height:18px;">Learn something new every day</div>
+                        <div class="resource-description" style="margin-top:2px; color:#64748b; font-size:12px; line-height:18px;">@T.T("testEmail.resources.wikipedia", lang)</div>
                     </td>
-                    <td class="resource-row resource-arrow" align="right" style="padding:0; border-top:1px solid #e5e7eb; color:#0f766e; font-family:Arial,Helvetica,sans-serif; font-size:16px;"><a href="https://www.wikipedia.org/" target="_blank" rel="noopener noreferrer" aria-label="Open Wikipedia" style="display:block; padding:14px 0 14px 12px; color:inherit; text-decoration:none;">↗</a></td>
+                    <td class="resource-row resource-arrow" align="right" style="padding:0; border-top:1px solid #e5e7eb; color:#0f766e; font-family:Arial,Helvetica,sans-serif; font-size:16px;"><a href="https://www.wikipedia.org/" target="_blank" rel="noopener noreferrer" aria-label="@T.T("testEmail.resources.open", lang, "Wikipedia")" style="display:block; padding:14px 0 14px 12px; color:inherit; text-decoration:none;">↗</a></td>
                 </tr>
                 <tr>
                     <td class="resource-row" width="42" valign="top" style="padding:14px 0; border-top:1px solid #e5e7eb;">
@@ -77,9 +80,9 @@
                     </td>
                     <td class="resource-row" style="padding:14px 8px; border-top:1px solid #e5e7eb; font-family:Arial,Helvetica,sans-serif;">
                         <a class="resource-link" href="https://www.microsoft.com/" target="_blank" rel="noopener noreferrer" style="color:#0f172a; font-size:14px; line-height:20px; font-weight:700; text-decoration:underline;">Microsoft</a>
-                        <div class="resource-description" style="margin-top:2px; color:#64748b; font-size:12px; line-height:18px;">Tools to create and get things done</div>
+                        <div class="resource-description" style="margin-top:2px; color:#64748b; font-size:12px; line-height:18px;">@T.T("testEmail.resources.microsoft", lang)</div>
                     </td>
-                    <td class="resource-row resource-arrow" align="right" style="padding:0; border-top:1px solid #e5e7eb; color:#0f766e; font-family:Arial,Helvetica,sans-serif; font-size:16px;"><a href="https://www.microsoft.com/" target="_blank" rel="noopener noreferrer" aria-label="Open Microsoft" style="display:block; padding:14px 0 14px 12px; color:inherit; text-decoration:none;">↗</a></td>
+                    <td class="resource-row resource-arrow" align="right" style="padding:0; border-top:1px solid #e5e7eb; color:#0f766e; font-family:Arial,Helvetica,sans-serif; font-size:16px;"><a href="https://www.microsoft.com/" target="_blank" rel="noopener noreferrer" aria-label="@T.T("testEmail.resources.open", lang, "Microsoft")" style="display:block; padding:14px 0 14px 12px; color:inherit; text-decoration:none;">↗</a></td>
                 </tr>
             </table>
         </td>
@@ -87,5 +90,5 @@
 </table>
 
 <p class="email-signoff" style="margin:22px 0 0; color:#475569; font-family:Arial,Helvetica,sans-serif; font-size:13px; line-height:20px;">
-    Here’s to a curious start and great things ahead.
+    @T.T("testEmail.signoff", lang)
 </p>

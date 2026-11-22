@@ -28,7 +28,7 @@
         <EmbeddedResource Update="Studio/Assets/third-party-notices.txt"
                           Pack="true" PackagePath="THIRD-PARTY-NOTICES.txt" />
         <Content Remove="Studio/DefaultTemplates/**/*.cshtml" Condition="'$(DesignTimeBuild)' != 'true'" />
-        <Compile Remove="Studio/DefaultTemplates/**/*.cshtml.cs" Condition="'$(DesignTimeBuild)' != 'true'" />
+        <Compile Remove="Studio/DefaultTemplates/**/*.cs" Condition="'$(DesignTimeBuild)' != 'true'" />
         <EmbeddedResource Include="Studio/DefaultTemplates/Shared/Layout.cshtml"
                           LogicalName="EmailStudio.DefaultTemplates.Shared.Layout.cshtml"
                           Pack="true" PackagePath="build/EmailStudioTemplates/Shared/Layout.cshtml" />
@@ -41,6 +41,12 @@
         <EmbeddedResource Include="Studio/DefaultTemplates/TestEmail.cshtml.cs"
                           LogicalName="EmailStudio.DefaultTemplates.TestEmail.cshtml.cs"
                           Pack="true" PackagePath="build/EmailStudioTemplates/TestEmail.cshtml.cs" />
+        <EmbeddedResource Include="Studio/DefaultTemplates/SupportedLanguages.cs"
+                          LogicalName="EmailStudio.DefaultTemplates.SupportedLanguages.cs"
+                          Pack="true" PackagePath="build/EmailStudioTemplates/SupportedLanguages.cs" />
+        <EmbeddedResource Include="Studio/DefaultTemplates/Translations/eng.json"
+                          LogicalName="EmailStudio.DefaultTemplates.Translations.eng.json"
+                          Pack="true" PackagePath="build/EmailStudioTemplates/Translations/eng.json" />
     </ItemGroup>
 
     <ItemGroup>

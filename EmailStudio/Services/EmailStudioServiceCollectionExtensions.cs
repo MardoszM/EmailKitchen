@@ -9,12 +9,13 @@ namespace EmailStudio.Services;
 public static class EmailStudioServiceCollectionExtensions
 {
     /// <summary>
-    /// Registers the Razor services and default view renderer used by Email Studio.
+    /// Registers the Razor services, default view renderer, and JSON email translator used by Email Studio.
     /// </summary>
     /// <param name="services">The application's service collection.</param>
     /// <returns>The same service collection so that additional registrations can be chained.</returns>
     /// <remarks>
     /// An existing <see cref="IRazorViewRendererService"/> registration is preserved.
+    /// An existing <see cref="IEmailTranslator"/> registration is also preserved.
     /// To enable sending test emails, register an implementation of <see cref="IEmailSender"/> separately.
     /// Map the Studio endpoints with <see cref="EmailStudio.Studio.EmailStudioEndpoints.MapEmailStudio"/>
     /// after building the application.
@@ -23,6 +24,7 @@ public static class EmailStudioServiceCollectionExtensions
     {
         services.AddRazorPages().AddApplicationPart(typeof(EmailStudioServiceCollectionExtensions).Assembly);
         services.TryAddScoped<IRazorViewRendererService, RazorViewRendererService>();
+        services.TryAddSingleton<IEmailTranslator, JsonEmailTranslator>();
         return services;
     }
 }

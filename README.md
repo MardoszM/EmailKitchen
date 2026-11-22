@@ -24,6 +24,36 @@ The path is relative to the application project directory. On the first build, t
 
 If `EmailStudioTemplatesPath` is omitted, EmailStudio uses `./EmailStudio/Templates`. Missing starter files are copied to that location.
 
+## Starter email translations
+
+The starter files include `SupportedLanguages.cs` with English (`eng`) and `Translations/eng.json`.
+The shared layout model exposes `Language`; `TestEmailModel.CreateDefaultModel()` selects `SupportedLanguages.eng`.
+Both the layout and the test email read their text through `IEmailTranslator`, which `AddEmailStudio()` registers automatically.
+
+Choose the language through the model, including in Studio's Model JSON editor:
+
+```json
+{
+  "language": "eng",
+  "name": "Alex Morgan",
+  "brandName": "Your application"
+}
+```
+
+To add a language, extend the copied enum and add a JSON file with the same name in `Translations`,
+for example `pl` and `Translations/pl.json`. Keep the translation keys and set `layout.language`
+to the HTML language tag, such as `pl`. Numbered placeholders like `{0}` are filled by the translator.
+`Message`, `Preheader`, and `FooterText` remain optional model overrides; leave them null to use translations.
+
+Translation JSON files are copied to build and publish output along with the templates.
+In Development they are reloaded on each render, and edits update the preview's revision.
+Other environments cache translations until the application restarts. Missing files or keys display the key itself.
+
+All starter files are copied only when the configured template folder contains no Razor templates.
+Existing templates and their translations are preserved on subsequent builds and package updates.
+Hosts with their own translation service can register `IEmailTranslator` before calling `AddEmailStudio()`
+or keep using their existing localization in their own templates.
+
 ## Map the studio
 
 ```csharp

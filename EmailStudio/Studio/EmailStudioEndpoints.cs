@@ -28,7 +28,9 @@ public static class EmailStudioEndpoints
         ("EmailStudio.DefaultTemplates.Shared.Layout.cshtml", "Shared/Layout.cshtml"),
         ("EmailStudio.DefaultTemplates.Shared.Layout.cshtml.cs", "Shared/Layout.cshtml.cs"),
         ("EmailStudio.DefaultTemplates.TestEmail.cshtml", "TestEmail.cshtml"),
-        ("EmailStudio.DefaultTemplates.TestEmail.cshtml.cs", "TestEmail.cshtml.cs")
+        ("EmailStudio.DefaultTemplates.TestEmail.cshtml.cs", "TestEmail.cshtml.cs"),
+        ("EmailStudio.DefaultTemplates.SupportedLanguages.cs", "SupportedLanguages.cs"),
+        ("EmailStudio.DefaultTemplates.Translations.eng.json", "Translations/eng.json")
     ];
 
     private static readonly JsonSerializerOptions ModelOptions = new()
@@ -163,7 +165,7 @@ public static class EmailStudioEndpoints
     private static Stream OpenAsset(string name) =>
         typeof(EmailStudioEndpoints).Assembly.GetManifestResourceStream($"EmailStudio.{name}")!;
 
-    private static string GetConfiguredTemplatesPath()
+    internal static string GetConfiguredTemplatesPath()
     {
         var configuredPath = Assembly.GetEntryAssembly()?.GetCustomAttributes<AssemblyMetadataAttribute>()
             .FirstOrDefault(attribute => attribute.Key == "EmailStudioTemplatesPath")?.Value;
@@ -231,6 +233,7 @@ public static class EmailStudioEndpoints
             }
 
             foreach (var file in Directory.EnumerateFiles(directory, "*.cshtml.cs", SearchOption.AllDirectories)
+                         .Concat(Directory.EnumerateFiles(directory, "*.json", SearchOption.AllDirectories))
                          .Order(StringComparer.OrdinalIgnoreCase))
             {
                 revision.Add(Path.GetRelativePath(directory, file), StringComparer.Ordinal);

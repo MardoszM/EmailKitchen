@@ -18,6 +18,14 @@
     <Compile Include="**/*.cs" Exclude="@(Compile);$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder)" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(UsingMicrosoftNETSdkWeb)' == 'true'">
+    <Content Include="$(_EmailStudioTemplatesRelativePath)/Translations/*.json"
+             Exclude="@(Content);$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder)"
+             CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Update="$(_EmailStudioTemplatesRelativePath)/Translations/*.json"
+             CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
   <ItemGroup>
     <Analyzer Include="$(MSBuildThisFileDirectory)../../EmailStudio.Analyzers/bin/$(Configuration)/netstandard2.0/EmailStudio.Analyzers.dll"
               Condition="Exists('$(MSBuildThisFileDirectory)../../EmailStudio.Analyzers/bin/$(Configuration)/netstandard2.0/EmailStudio.Analyzers.dll')" />
@@ -63,6 +71,11 @@
                Exclude="@(Content);$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder)" />
       <Compile Include="$(_EmailStudioTemplatesRelativePath)/**/*.cs"
                Exclude="@(Compile);$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder)" />
+      <Content Include="$(_EmailStudioTemplatesRelativePath)/Translations/*.json"
+               Exclude="@(Content);$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder)"
+               CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+      <Content Update="$(_EmailStudioTemplatesRelativePath)/Translations/*.json"
+               CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     </ItemGroup>
   </Target>
 </Project>
