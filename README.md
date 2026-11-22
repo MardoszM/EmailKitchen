@@ -37,6 +37,27 @@ if (app.Environment.IsDevelopment())
 
 The studio is available at `/email-studio` when its endpoints are mapped.
 
+## Preview email clients
+
+Choose an email app above the preview to explore a local simulation of its rendering rules.
+The browser original, client selection, compatibility notes, and light/dark preview are available
+in both Studio and the separate Live Preview window. Changing the client uses the last rendered
+HTML and does not send another render request or alter the HTML sent by `IEmailSender`.
+
+Client previews are approximations, not screenshots from the actual email apps. In particular,
+Outlook Classic's Word rendering engine is not running in the preview. Compatibility notes can
+help identify unsupported CSS but do not guarantee an identical result in a recipient's inbox.
+
+The pinned MIT-licensed Emailens engine runs in a browser worker, without an account, API key,
+hosted service, or per-run quota. The bundled build removes its HTML-size and warning-location
+caps; large emails still depend on the browser's available CPU and memory. Remote images and
+fonts in the email may require network access. Third-party license notices are included in the
+NuGet package and available at `/email-studio/assets/third-party-notices.txt`.
+
+The prebuilt browser assets are checked in, so NuGet consumers need no Node.js installation.
+To rebuild them when developing EmailStudio, run `npm ci --ignore-scripts` and `npm run build`
+in `tools/client-preview`. The build pins its dependencies and verifies the two local limit changes.
+
 ## Authorize production access
 
 `MapEmailStudio()` returns a `RouteGroupBuilder`. Apply `RequireAuthorization(...)` to the returned group to protect every Studio endpoint, including the interface, assets, models, previews, rendering, and test email sending.

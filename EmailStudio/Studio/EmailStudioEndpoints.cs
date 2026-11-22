@@ -93,6 +93,9 @@ public static class EmailStudioEndpoints
         {
             "studio.css" => ServeAsset(asset, "text/css; charset=utf-8"),
             "studio.js" => ServeAsset(asset, "text/javascript; charset=utf-8", GetStudioRoot(context)),
+            "client-preview.js" or "client-preview.worker.js" or "client-profiles.js" or "emailens-engine.js" =>
+                ServeAsset(asset, "text/javascript; charset=utf-8"),
+            "third-party-notices.txt" => ServeAsset(asset, "text/plain; charset=utf-8"),
             "email-studio-logo.png" => ServeLogo(context),
             _ => Results.NotFound()
         });

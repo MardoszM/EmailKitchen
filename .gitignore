@@ -4,6 +4,7 @@
 artifacts/
 TestResults/
 coverage/
+**/node_modules/
 
 # Packages created by local NuGet packing
 *.nupkg

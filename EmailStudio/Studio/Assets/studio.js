@@ -1,8 +1,18 @@
+import { createClientPreview } from "./client-preview.js";
+
 const root = "__EMAIL_STUDIO_ROOT__";
 const byId = id => document.getElementById(id);
-const frame = byId("preview");
+let frame = byId("preview");
+let pendingFrame = null;
 const status = byId("action-status");
 const originalMediaQueries = new WeakMap();
+const clientPreview = createClientPreview({
+    surface: frame.parentElement,
+    onRender: setPreviewHtml,
+    cancelPendingRender: cancelPendingPreview,
+    readPreference,
+    savePreference
+});
 
 function readPreference(key) {
     try {
@@ -20,6 +30,18 @@ function savePreference(key, value) {
     }
 }
 
+function initializeHeaderOptions() {
+    const options = byId("header-options");
+    const compact = matchMedia("(max-width: 760px)");
+
+    function apply() {
+        options.open = !compact.matches;
+    }
+
+    apply();
+    compact.addEventListener("change", apply);
+}
+
 function initializeTheme() {
     const key = "emailstudio.theme";
     const select = byId("theme");
@@ -31,9 +53,9 @@ function initializeTheme() {
             ? (system.matches ? "dark" : "light")
             : select.value;
         applyPreviewTheme();
+        clientPreview.setTheme(document.documentElement.dataset.theme);
     }
 
-    frame.addEventListener("load", applyPreviewTheme);
     apply(readPreference(key));
     select.addEventListener("change", () => {
         apply(select.value);
@@ -49,11 +71,13 @@ function initializeTheme() {
 function initializePreviewWidth() {
     const key = "emailstudio.preview-width";
     const mobileWidthKey = "emailstudio.mobile-preview-width";
+    const compact = matchMedia("(max-width: 760px), (hover: none) and (pointer: coarse)");
     const minWidth = 320;
     const maxWidth = 760;
     const defaultWidth = 390;
     const buttons = document.querySelectorAll(".view-controls [data-width]");
     const handle = byId("preview-resize-handle");
+    let preference = readPreference(key);
     let mobileWidth = normalizeMobileWidth(readPreference(mobileWidthKey));
     let activePointer = null;
     let dragStartX = 0;
@@ -79,8 +103,8 @@ function initializePreviewWidth() {
             savePreference(mobileWidthKey, String(mobileWidth));
     }
 
-    function apply(preference) {
-        const width = preference === "mobile" ? "mobile" : "desktop";
+    function apply() {
+        const width = !compact.matches && preference === "mobile" ? "mobile" : "desktop";
         document.documentElement.dataset.previewWidth = width;
         handle.hidden = width !== "mobile";
         for (const button of buttons)
@@ -88,11 +112,13 @@ function initializePreviewWidth() {
     }
 
     applyMobileWidth();
-    apply(readPreference(key));
+    apply();
+    compact.addEventListener("change", apply);
     for (const button of buttons) {
         button.addEventListener("click", () => {
-            apply(button.dataset.width);
-            savePreference(key, button.dataset.width);
+            preference = button.dataset.width;
+            apply();
+            savePreference(key, preference);
         });
     }
     handle.addEventListener("pointerdown", event => {
@@ -134,15 +160,16 @@ function initializePreviewWidth() {
         }
     });
     window.addEventListener("storage", event => {
-        if (event.key === key || event.key === null)
-            apply(event.newValue);
+        if (event.key === key || event.key === null) {
+            preference = event.newValue;
+            apply();
+        }
         if (event.key === mobileWidthKey || event.key === null)
             setMobileWidth(event.newValue);
     });
 }
 
-function applyPreviewTheme() {
-    const preview = frame.contentDocument;
+function applyPreviewTheme(preview = frame.contentDocument) {
     if (!preview)
         return;
 
@@ -220,19 +247,54 @@ async function render(template, model) {
 }
 
 function showPreview(html, preserveScroll = false) {
-    if (frame.srcdoc === html)
-        return;
+    clientPreview.show(html, preserveScroll);
+}
 
-    const scroll = preserveScroll ? frame.contentDocument?.scrollingElement : null;
-    const top = scroll?.scrollTop ?? 0;
-    const left = scroll?.scrollLeft ?? 0;
-    if (top || left) {
-        frame.addEventListener("load", () => {
-            frame.contentDocument?.scrollingElement?.scrollTo(left, top);
-        }, { once: true });
+function cancelPendingPreview() {
+    pendingFrame?.remove();
+    pendingFrame = null;
+}
+
+function setPreviewHtml(html, preserveScroll, onReady) {
+    if (html === null) {
+        frame.removeAttribute("srcdoc");
+        return;
+    }
+    if (frame.srcdoc === html) {
+        onReady();
+        return;
     }
 
-    frame.srcdoc = html;
+    // Keep the previous email visible until the replacement is ready to paint.
+    const next = frame.cloneNode(false);
+    next.removeAttribute("id");
+    next.classList.add("preview-frame-pending");
+    next.inert = true;
+    next.srcdoc = html;
+    pendingFrame = next;
+    next.addEventListener("load", () => {
+        if (pendingFrame !== next)
+            return;
+
+        const scroll = preserveScroll ? frame.contentDocument?.scrollingElement : null;
+        applyPreviewTheme(next.contentDocument);
+        if (scroll) {
+            next.contentDocument?.scrollingElement?.scrollTo({
+                top: scroll.scrollTop,
+                left: scroll.scrollLeft,
+                behavior: "instant"
+            });
+        }
+
+        frame.remove();
+        next.id = "preview";
+        next.inert = false;
+        next.classList.remove("preview-frame-pending");
+        frame = next;
+        pendingFrame = null;
+        onReady();
+    }, { once: true });
+    frame.after(next);
 }
 
 function watchCatalog(update, failed) {
@@ -262,6 +324,7 @@ function watchCatalog(update, failed) {
 }
 
 function startStudio() {
+    const previewPanel = byId("preview-panel");
     const search = byId("search");
     const list = byId("template-list");
     const model = byId("model");
@@ -325,7 +388,7 @@ function startStudio() {
         if (preview)
             showPreview(preview.html);
         else
-            frame.removeAttribute("srcdoc");
+            clientPreview.clear();
         updateOpen(draft);
     }
 
@@ -474,6 +537,8 @@ function startStudio() {
                 showPreview(html, runtime);
                 byId("preview-empty").hidden = true;
                 updateOpen(draft);
+                if (!runtime && matchMedia("(max-width: 760px)").matches)
+                    previewPanel.scrollIntoView({ behavior: "smooth", block: "start" });
             }
         } catch (error) {
             draft.error = error.message;
@@ -682,6 +747,7 @@ function startStandalonePreview() {
 
 initializeTheme();
 initializePreviewWidth();
+initializeHeaderOptions();
 if (document.body.dataset.page === "studio")
     startStudio();
 else

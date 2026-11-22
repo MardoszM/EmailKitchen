@@ -25,6 +25,8 @@
     <ItemGroup>
         <EmbeddedResource Include="Studio/Assets/*"
                           LogicalName="EmailStudio.%(Filename)%(Extension)" />
+        <EmbeddedResource Update="Studio/Assets/third-party-notices.txt"
+                          Pack="true" PackagePath="THIRD-PARTY-NOTICES.txt" />
         <Content Remove="Studio/DefaultTemplates/**/*.cshtml" Condition="'$(DesignTimeBuild)' != 'true'" />
         <Compile Remove="Studio/DefaultTemplates/**/*.cshtml.cs" Condition="'$(DesignTimeBuild)' != 'true'" />
         <EmbeddedResource Include="Studio/DefaultTemplates/Shared/Layout.cshtml"
