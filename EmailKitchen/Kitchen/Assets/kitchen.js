@@ -46,23 +46,31 @@ function initializeHeaderOptions() {
 function initializeTheme() {
     const key = "emailkitchen.theme";
     const select = byId("theme");
+    const options = document.querySelectorAll("[data-theme-option]");
     const system = matchMedia("(prefers-color-scheme: dark)");
+    let preference = "system";
 
-    function apply(preference) {
-        select.value = preference === "light" || preference === "dark" ? preference : "system";
-        document.documentElement.dataset.theme = select.value === "system"
+    function apply(value) {
+        preference = value === "light" || value === "dark" ? value : "system";
+        select.value = preference;
+        document.documentElement.dataset.theme = preference === "system"
             ? (system.matches ? "dark" : "light")
-            : select.value;
+            : preference;
+        options.forEach(option => option.setAttribute("aria-pressed", String(option.dataset.themeOption === preference)));
         applyPreviewTheme();
         clientPreview.setTheme(document.documentElement.dataset.theme);
     }
 
     apply(readPreference(key));
+    options.forEach(option => option.addEventListener("click", () => {
+        apply(option.dataset.themeOption);
+        savePreference(key, preference);
+    }));
     select.addEventListener("change", () => {
         apply(select.value);
-        savePreference(key, select.value);
+        savePreference(key, preference);
     });
-    system.addEventListener("change", () => apply(select.value));
+    system.addEventListener("change", () => apply(preference));
     window.addEventListener("storage", event => {
         if (event.key === key || event.key === null)
             apply(event.newValue);
@@ -336,6 +344,7 @@ function startKitchen() {
     const list = byId("template-list");
     const model = byId("model");
     const renderButton = byId("render");
+    const renderLabel = byId("render-label");
     const sendButton = byId("send");
     const sendTooltip = byId("send-tooltip");
     const reset = byId("reset");
@@ -360,10 +369,13 @@ function startKitchen() {
 
     function updateControls() {
         const draft = drafts.get(selected);
+        const baking = draft?.rendering === true;
         model.disabled = !draft;
         model.setAttribute("aria-invalid", String(Boolean(draft?.validationError)));
         reset.disabled = !draft;
-        renderButton.disabled = !draft?.model || draft.rendering;
+        renderButton.disabled = !draft?.model || baking;
+        renderButton.setAttribute("aria-busy", String(baking));
+        renderLabel.textContent = baking ? "Baking…" : "Bake";
         sendButton.disabled = !senderStatusKnown || !canSend || !draft?.model || sending !== null;
         const senderMessage = !senderStatusKnown
             ? "Checking whether IEmailSender is registered…"
@@ -383,9 +395,9 @@ function startKitchen() {
         } else {
             open.removeAttribute("href");
             open.setAttribute("aria-disabled", "true");
-            openTooltip.dataset.tooltip = "Render this template first to enable Live Preview.";
+            openTooltip.dataset.tooltip = "Use Bake to preview this recipe first.";
             openTooltip.tabIndex = 0;
-            openTooltip.setAttribute("aria-label", "Open Live Preview unavailable. Render this template first.");
+            openTooltip.setAttribute("aria-label", "Open Live Tasting unavailable. Choose Bake to preview the recipe first.");
         }
     }
 
@@ -409,19 +421,19 @@ function startKitchen() {
         if (draft?.validationError) {
             setMessage("error", draft.validationError);
         } else if (draft?.rendering) {
-            setMessage("busy", "Rendering…");
+            setMessage("busy", "Baking email preview…");
         } else if (draft?.error) {
             setMessage("error", draft.error);
         } else if (draft?.sentTo) {
             setMessage("ready", `Email sent to ${draft.sentTo}.`);
         } else if (draft?.rendered && JSON.stringify(draft.rendered.model) !== JSON.stringify(draft.model)) {
-            setMessage("changed", "Model changed. Render to update the preview.");
+            setMessage("changed", "Ingredients changed. Choose Bake to update the preview.");
         } else if (draft?.rendered) {
-            setMessage("ready", "Rendered");
+            setMessage("ready", "Baked");
         } else if (draft) {
-            setMessage("idle", "Ready to render");
+            setMessage("idle", "Ready to bake");
         } else {
-            setMessage("idle", selected ? "Loading model…" : "Select a template to get started.");
+            setMessage("idle", selected ? "Loading ingredients…" : "Choose a recipe to get started.");
         }
     }
 
@@ -441,7 +453,7 @@ function startKitchen() {
         if (!matches.length) {
             const message = document.createElement("p");
             message.className = "list-message";
-            message.textContent = query ? "No matching templates." : "No email templates found.";
+            message.textContent = query ? "No matching recipes." : "No email recipes found.";
             list.replaceChildren(message);
             return;
         }
@@ -470,7 +482,7 @@ function startKitchen() {
         let draft = drafts.get(name);
         model.value = draft?.source ?? "";
         model.scrollTop = 0;
-        byId("preview-name").textContent = name ?? "Select a template";
+        byId("preview-name").textContent = name ?? "Choose a recipe";
         showDraft(draft);
         updateMessage(draft);
         updateSelection();
@@ -661,8 +673,8 @@ function startKitchen() {
         }
     }, () => {
         if (!catalogLoaded) {
-            list.querySelector(".list-message").textContent = "Unable to load templates.";
-            setMessage("error", "Unable to load templates.");
+            list.querySelector(".list-message").textContent = "Unable to load recipes.";
+            setMessage("error", "Unable to load recipes.");
         }
     });
 }

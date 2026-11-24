@@ -4,11 +4,11 @@
 
 Move email markup scattered across C# strings into readable `.cshtml` views. Keep the copy and markup together, supply message data through typed C# models, and share headers, footers, and branding through Razor layouts.
 
-EmailKitchen adds a browser workspace for those templates. Preview welcome emails, receipts, and password resets with realistic sample data, then send a test through your existing mail provider.
+EmailKitchen adds a browser workspace for email templates. Pick a recipe to preview welcome emails, receipts, and password resets with realistic sample data, then send a test through your existing mail provider.
 
 [How it works](#how-it-works) · [Installation](#installation) · [Configuration guides](#configuration-guides)
 
-![Editing the model JSON and rendering the Razor email again to see the updated message](docs/images/render-model-loop.webp)
+![Baking a welcome email, editing its Workspace property in Ingredients JSON, and baking again to see the new workspace name](docs/images/render-model-loop.webp)
 
 [View the full workspace screenshot](docs/images/razor-email-workspace.webp)
 
@@ -16,39 +16,35 @@ EmailKitchen adds a browser workspace for those templates. Preview welcome email
 
 ### Render a template with sample data
 
-Find a view in the searchable **Templates** list. **Model JSON** starts with sample values from your C# model. Change a recipient name, adjust an amount, or switch the language, then click **Render** again. Razor runs your view with its layout and injected services, so you can see what your application would produce with those values.
+Find a Razor email template in the searchable **Recipes** list. Search by its name or folder as your catalog grows. **Ingredients (JSON)** starts with sample values from your C# model. Change a recipient name, adjust an amount, or switch the language, then choose **Bake** to render the preview. Razor runs your view with its layout and injected services, so you can see what your application would produce with those values.
 
-Press **Ctrl+Enter** or **Cmd+Enter** to render from the editor. The JSON draft belongs to the selected template in the current workspace session. **Reset** restores sample data. Edit the template or its `CreateDefaultModel()` factory in your IDE.
+Press **Ctrl+Enter** or **Cmd+Enter** to render from the editor. The JSON draft belongs to the selected recipe in the current workspace session. **Reset** restores sample data. Edit the template or its `CreateDefaultModel()` factory in your IDE.
 
 Use JSON translations to preview the same template in different languages. Application services and background jobs can call `IRazorViewRendererService` to render the view to HTML with a typed model.
 
 ### Check desktop, mobile, and dark-mode layouts
 
-Switch between **Large** and **Mobile** to check the same email at different viewport sizes. On desktop, drag the mobile resize handle to test widths from 320 to 760 px and watch the content reflow.
+Switch between **Large** and **Mobile** to check the same email at different viewport sizes. Use **Theme** to choose the preview theme: **Light**, **Dark**, or **System** (follows your device). On desktop, drag the mobile resize handle from 320 to 760 px and watch the email reflow. Emailens simulates the selected client's dark-mode adjustments when available.
 
-Choose **Light** or **Dark** to check how text, logos, and buttons look in either color scheme. **System** follows your device setting. In a dark preview with a client profile selected, Emailens simulates that client's color adjustments. The demo switches from Light to Dark at the same width.
+![Switching to Dark, choosing Mobile, and dragging the preview wider to see the email reflow](docs/images/mobile-resize-loop.webp)
 
-![Switching from Large to Mobile, resizing the preview, and selecting Dark](docs/images/mobile-resize-loop.webp)
+On a phone, browse recipes, edit the model, render a quick preview, and send a test email if a sender is configured.
 
-[Compare Large and Mobile views side by side](docs/images/large-and-mobile-previews.webp)
-
-On a phone, browse templates, edit the model, render a quick preview, and send a test email if a sender is configured.
-
-![EmailKitchen workspace on a phone](docs/images/mobile-workspace.webp)
+![Baking an email in the mobile EmailKitchen workspace and scrolling through the rendered message](docs/images/mobile-workspace.webp)
 
 ### Preview Gmail, Outlook, and Apple Mail with Emailens
 
 Choose a client under **Preview as** to see how your email is likely to look in that inbox. **Emailens** applies that client’s HTML and CSS rules locally in your browser. Explore 21 profiles, including desktop and mobile versions of Gmail, Outlook, and Apple Mail. Switch back to **Browser original** to compare with the Razor output.
 
-In the example below, the gradient header becomes solid teal in the Outlook Classic simulation. Open **Notes** for details about CSS support. [Emailens engine documentation](https://docs.emailens.dev/engine)
+The three previews below show **Browser original**, **Outlook Classic**, and **Outlook Classic with Notes open**. The simulated Outlook view uses the solid fallback color for the gradient header. Notes explain which CSS rules may cause those differences. [Emailens engine documentation](https://docs.emailens.dev/engine)
 
-![EmailKitchen showing the selected Browser original and Outlook Classic profiles, Light theme, Large view, and each rendered email preview](docs/images/email-client-compatibility.webp)
+![Three EmailKitchen preview panels showing Browser original, Outlook Classic, and Outlook Classic with its compatibility notes open](docs/images/email-client-compatibility.webp)
 
 ### Watch edits in Live Preview
 
-Click **Open Live Preview** and keep the new tab beside your IDE. When the app runs under `dotnet watch`, it checks for template changes and renders again with the model you opened it with.
+Click **Open Live Tasting** to open the **Live Preview** beside your IDE. With `dotnet watch`, it renders template changes with your selected model, updating the preview in place.
 
-![Saving a translation in VS Code and seeing the email update in Live Preview](docs/images/live-preview-loop.webp)
+![Editing and saving a Razor template in VS Code beside EmailKitchen Live Preview, which updates automatically under dotnet watch](docs/images/live-preview-loop.webp)
 
 If a Razor edit lags behind Hot Reload, refresh the preview once the build picks it up.
 
@@ -56,7 +52,7 @@ If a Razor edit lags behind Hot Reload, refresh the preview once the build picks
 
 Click **Send Email** and enter a recipient and subject. EmailKitchen renders fresh HTML from the current model and hands it to your registered `IEmailSender`. Client simulation and theme affect the preview only. Open the message in a real inbox to verify how it arrives.
 
-![EmailKitchen test email dialog with recipient and subject fields](docs/images/send-test-email.webp)
+![Sending a payment receipt from EmailKitchen to a local test inbox and seeing the delivery confirmation](docs/images/send-test-email.webp)
 
 ## Installation
 

@@ -58,7 +58,7 @@ For your own shared model base, add `[EmailKitchenTemplateBase]` from the `Email
 
 ## Add a language
 
-The starter resolves translations through `IEmailTranslator`. To add Polish, add `pl` to `SupportedLanguages` and copy `Translations/eng.json` to `Translations/pl.json`. Translate the values, preserve the keys and numbered placeholders, and change the `layout.language` value to `pl`. In **Model JSON**, set `"language": "pl"` and render.
+The starter resolves translations through `IEmailTranslator`. To add Polish, add `pl` to `SupportedLanguages` and copy `Translations/eng.json` to `Translations/pl.json`. Translate the values, preserve the keys and numbered placeholders, and change the `layout.language` value to `pl`. In **Ingredients (JSON)**, set `"language": "pl"` and render.
 
 The starter's `Message`, `Preheader`, and `FooterText` fields override translated text when supplied. In Development the JSON files are read on lookup. Other environments cache translations by language until restart. Missing entries display the key. For an existing localization service, register your implementation of `IEmailTranslator` before `AddEmailKitchen()` or inject your service directly into the views.
 

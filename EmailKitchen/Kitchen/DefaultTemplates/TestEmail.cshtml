@@ -23,7 +23,7 @@
     <tr>
         <td style="padding:0 0 8px;">
             <p class="email-eyebrow"
-               style="margin:0; color:#0d4540; font-size:11px; line-height:16px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase;">
+               style="margin:0; color:#965c3d; font-size:11px; line-height:16px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase;">
                 @T.T("testEmail.eyebrow", lang)
             </p>
         </td>
@@ -31,27 +31,27 @@
     <tr>
         <td style="padding:0 0 12px;">
             <h1 class="email-heading"
-                style="margin:0; color:#101828; font-size:28px; line-height:34px; font-weight:700;">
+                style="margin:0; color:#2b2b2b; font-size:28px; line-height:34px; font-weight:700;">
                 @T.T("testEmail.greeting", lang, Model.Name ?? string.Empty)
             </h1>
         </td>
     </tr>
     <tr>
         <td style="padding:0 0 24px;">
-            <p class="email-message" style="margin:0; color:#303e50; font-size:15px; line-height:24px;">
+            <p class="email-message" style="margin:0; color:#4a4a4a; font-size:15px; line-height:24px;">
                 @(Model.Message ?? T.T("testEmail.message", lang))
             </p>
         </td>
     </tr>
     <tr>
         <td>
-            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" bgcolor="#f8fafc"
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" bgcolor="#f5f5f5"
                    class="resource-card"
-                   style="background-color:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-family:Arial,Helvetica,sans-serif;">
+                   style="background-color:#f5f5f5; border:1px solid #d9d9d9; border-radius:12px; font-family:Arial,Helvetica,sans-serif;">
                 <tr>
                     <td style="padding:16px 16px 6px;">
                         <p class="resource-section-heading"
-                           style="margin:0; color:#0d4540; font-size:11px; line-height:16px; font-weight:700; letter-spacing:1px; text-transform:uppercase;">
+                           style="margin:0; color:#965c3d; font-size:11px; line-height:16px; font-weight:700; letter-spacing:1px; text-transform:uppercase;">
                             @T.T("testEmail.resources.title", lang)
                         </p>
                     </td>
@@ -59,7 +59,7 @@
                 <tr>
                     <td style="padding:0 16px 10px;">
                         <p class="resource-section-copy"
-                           style="margin:0; color:#303e50; font-size:13px; line-height:20px;">
+                           style="margin:0; color:#4a4a4a; font-size:13px; line-height:20px;">
                             @T.T("testEmail.resources.description", lang)
                         </p>
                     </td>
@@ -72,7 +72,7 @@
                             {
                                 <tr>
                                     <td class="resource-row" width="36" valign="top"
-                                        style="padding:12px 0; border-top:1px solid #e5e7eb;">
+                                        style="padding:12px 0; border-top:1px solid #d9d9d9;">
                                         <table role="presentation" cellpadding="0" cellspacing="0" border="0"
                                                width="28">
                                             <tr>
@@ -86,21 +86,21 @@
                                         </table>
                                     </td>
                                     <td class="resource-row" valign="top"
-                                        style="padding:12px 0; border-top:1px solid #e5e7eb;">
+                                        style="padding:12px 0; border-top:1px solid #d9d9d9;">
                                         <a class="resource-link" href="@resource.Url" target="_blank"
                                            rel="noopener noreferrer"
-                                           style="color:#0f172a; font-size:14px; line-height:20px; font-weight:700; text-decoration:underline;">@resource.Name</a>
+                                           style="color:#2b2b2b; font-size:14px; line-height:20px; font-weight:700; text-decoration:underline;">@resource.Name</a>
                                         <p class="resource-description"
-                                           style="margin:0; color:#34404c; font-size:12px; line-height:18px;">
+                                           style="margin:0; color:#626262; font-size:12px; line-height:18px;">
                                             @T.T(resource.DescriptionKey, lang)
                                         </p>
                                     </td>
                                     <td class="resource-row" width="24" align="right" valign="top"
-                                        style="padding:12px 0; border-top:1px solid #e5e7eb; font-size:16px; line-height:20px;">
+                                        style="padding:12px 0; border-top:1px solid #d9d9d9; font-size:16px; line-height:20px;">
                                         <a class="resource-arrow" href="@resource.Url" target="_blank"
                                            rel="noopener noreferrer"
                                            aria-label="@T.T("testEmail.resources.open", lang, resource.Name)"
-                                           style="color:#0d4540; text-decoration:none;">↗</a>
+                                           style="color:#965c3d; text-decoration:none;">↗</a>
                                     </td>
                                 </tr>
                             }
@@ -112,7 +112,7 @@
     </tr>
     <tr>
         <td style="padding:20px 0 0;">
-            <p class="email-signoff" style="margin:0; color:#303e50; font-size:13px; line-height:20px;">
+            <p class="email-signoff" style="margin:0; color:#4a4a4a; font-size:13px; line-height:20px;">
                 @T.T("testEmail.signoff", lang)
             </p>
         </td>

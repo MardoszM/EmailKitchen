@@ -99,6 +99,7 @@ public static class EmailKitchenEndpoints
                 ServeAsset(asset, "text/javascript; charset=utf-8"),
             "third-party-notices.txt" => ServeAsset(asset, "text/plain; charset=utf-8"),
             "email-kitchen-logo.png" => ServeLogo(context),
+            "email-kitchen-icon.png" => ServeIcon(context),
             _ => Results.NotFound()
         });
         kitchen.MapGet("/templates", (IServiceProviderIsService services) =>
@@ -150,17 +151,32 @@ public static class EmailKitchenEndpoints
         return Results.File(EmailLogo.Open(), "image/png");
     }
 
+    private static IResult ServeIcon(HttpContext context)
+    {
+        context.Response.Headers.CacheControl = "no-store";
+
+        return Results.File(OpenAsset("email-kitchen-icon.png"), "image/png");
+    }
+
     private static string GetKitchenRoot(HttpContext context) => $"{context.Request.PathBase}{Route}";
 
     private static string ReplaceKitchenRoot(string content, string kitchenRoot) =>
         content.Replace("__EMAIL_KITCHEN_ROOT__", kitchenRoot, StringComparison.Ordinal)
-            .Replace("__EMAIL_KITCHEN_LOGO_URL__", GetLogoUrl(kitchenRoot), StringComparison.Ordinal);
+            .Replace("__EMAIL_KITCHEN_LOGO_URL__", GetLogoUrl(kitchenRoot), StringComparison.Ordinal)
+            .Replace("__EMAIL_KITCHEN_ICON_URL__", GetIconUrl(kitchenRoot), StringComparison.Ordinal);
 
     private static string GetLogoUrl(string kitchenRoot)
     {
         using var logo = EmailLogo.Open();
         var version = Convert.ToHexStringLower(SHA256.HashData(logo));
         return $"{kitchenRoot}/assets/email-kitchen-logo.png?v={version}";
+    }
+
+    private static string GetIconUrl(string kitchenRoot)
+    {
+        using var icon = OpenAsset("email-kitchen-icon.png");
+        var version = Convert.ToHexStringLower(SHA256.HashData(icon));
+        return $"{kitchenRoot}/assets/email-kitchen-icon.png?v={version}";
     }
 
     private static Stream OpenAsset(string name) =>
